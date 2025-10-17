@@ -1,0 +1,97 @@
+/* Header.css - Texto cerca del logo */
+.header {
+  background: rgba(237, 175, 250, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 0;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e42a2a;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  height: 100px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: flex-start; /* ← Cambiado: alineación a la izquierda */
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 100%;
+  gap: 20px; /* ← Espacio entre logo y título */
+}
+
+.logo-section {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-shrink: 0; /* ← Evita que se encoja */
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* ← Título pegado al logo */
+  height: 100%;
+  flex-grow: 1;
+}
+
+.header-title {
+  color: #0c3258;
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  /* Sin márgenes grandes */
+}
+
+.actions-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/* Espacio para el contenido */
+.content-wrapper {
+  margin-top: 120px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-container {
+    gap: 15px; /* ← Menos espacio en móvil */
+    padding: 0 15px;
+  }
+  
+  .header-title {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    gap: 10px; /* ← Mínimo espacio en móvil pequeño */
+  }
+  
+  .header-title {
+    font-size: 1.2rem;
+  }
+}

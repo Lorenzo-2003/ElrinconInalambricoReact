@@ -1,0 +1,118 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: montserrat;
+    background: linear-gradient(150deg, #aa2ecf, #0feee3c7);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* IniciarSesion.css */
+.login-container {
+    margin-top: 150px;  /* ← Espacio entre Header y contenido */
+    padding: 20px;
+    text-align: center;
+}
+
+.formulario{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 400px;
+    background: rgb(255, 255, 255);
+    border-radius: 10px;
+}
+
+.formulario h2{
+    text-align: center;
+    padding:0 0  20px 0;
+    border-bottom: 1px solid #adadad;
+}
+form .email, form .contrasena{
+    position: relative;
+    border-bottom: 2px solid #adadad;
+    margin: 30px 0;
+}
+
+.formulario form{
+    padding: 0 40px;
+    box-sizing: border-box;
+}
+
+form .email input{
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    background: transparent;
+}
+form .contrasena input{
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    background: transparent;
+}
+
+form .email label{
+    position: absolute;
+    top: 50%;
+    left: 0;
+    color: #adadad;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+    transition: .5s;
+}
+
+form .contrasena label{
+    position: absolute;
+    height: 50%;
+    left: 0;
+    color: #adadad;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+    transition: .5s;
+}
+
+form .email input:focus ~ label, form .email input:valid ~ label,
+form .contrasena input:focus ~ label, form .contrasena input:valid ~ label{
+    top: -5px;
+    color: #2691d9;
+    font-size: 12px;
+
+}
+form .email span, form .contrasena span{
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: #2691d9;
+    border-radius: 4px;
+    transition: .5s;
+    pointer-events: none;
+    transform: scaleX(0);
+
+}
+
+.alerta {
+    
+    margin-top: -10%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 40%;
+    
+}   
+
+@media screen and (max-width: 600px){
+    .formulario{
+        width: 80%;
+    }
+    
+}
