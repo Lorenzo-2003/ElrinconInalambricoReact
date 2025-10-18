@@ -1,0 +1,21 @@
+
+/* App.css */
+.App {
+  background-image: url('/Img/Fondo.jpg'); /* ← Tu imagen de fondo */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+.app-content {
+  margin-top: -48px; /* ← Reducir de 100px a 80px o menos */
+  min-height: calc(190vh - 700px);
+}
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
