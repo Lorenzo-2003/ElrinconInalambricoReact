@@ -1,6 +1,4 @@
-
 import React from "react";
-import { Link } from "react-router-dom";
 import CarouselMenu from "./CarouselMenu";
 import "./Menu.css";
 
@@ -143,3 +141,4 @@ export default function Menu() {
     </div>
   );
 }
+
