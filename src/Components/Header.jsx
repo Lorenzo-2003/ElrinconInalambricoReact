@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 22c0aa866fa65abdb558cd25180a081a959b4ed0
 import React from "react";
 import { Link } from "react-router-dom";
 import './Header.css';
@@ -27,7 +30,10 @@ export default function Menu() {
           </div>
         </div>
       </nav>
+<<<<<<< HEAD
     
+=======
+>>>>>>> 22c0aa866fa65abdb558cd25180a081a959b4ed0
     </div>
   );
 }

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 22c0aa866fa65abdb558cd25180a081a959b4ed0
 /* App.css */
 .App {
   background-image: url('/Img/Fondo.jpg'); /* ← Tu imagen de fondo */
@@ -17,4 +21,8 @@ html, body, #root {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 22c0aa866fa65abdb558cd25180a081a959b4ed0
 }
