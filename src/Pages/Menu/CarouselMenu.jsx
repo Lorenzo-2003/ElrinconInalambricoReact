@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Menu.css";
+import "../../Components/Header.css";
 
 const carouselImages = [
   { src: "/Img/Cartas.jpg", alt: "Cartas" },
