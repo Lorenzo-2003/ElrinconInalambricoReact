@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { usuariosValidos } from './iniciarSesion.js';
 import './iniciarSesion.css';
+import Header from '../../Components/Header'; // ← IMPORTA el Header
 
 export default function Login() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -17,47 +20,60 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Datos del login:', formData);
+    
+    const usuarioEncontrado = usuariosValidos.find(
+      user => user.email === formData.email && user.password === formData.password
+    );
+    
+    if (usuarioEncontrado) {
+      localStorage.setItem('usuarioLogueado', JSON.stringify(usuarioEncontrado));
+      window.location.href = './Menu2';
+    } else {
+      setError('Email o contraseña incorrectos');
+    }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2 className="login-title">Iniciar Sesión</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              placeholder="Correo electrónico"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+    <div className="menu-bg" style={{minHeight: '100vh'}}>
+      {/* USA el Header importado */}
+      <Header />
+      
+      <div className="login-container">
+        <div className="login-box">
+          <h2 className="login-title">Iniciar Sesión</h2>
+          
+          {error && <div className="alert alert-danger">{error}</div>}
+          
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                placeholder="Correo electrónico"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="password"
+                name="password"
+                className="form-control"
+                placeholder="Contraseña"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <button type="submit" className="btn-login">
+              Ingresar
+            </button>
+          </form>
+          <div className="login-links">
+            <p>¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link></p>
           </div>
-          <div className="form-group">
-            <input
-              type="password"
-              name="password"
-              className="form-control"
-              placeholder="Contraseña"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit" className="btn-login">
-            Ingresar
-          </button>
-        </form>
-        <div className="login-links">
-          <p>
-            ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
-          </p>
-          <p>
-            <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
-          </p>
         </div>
       </div>
     </div>

@@ -22,3 +22,8 @@ export const usuariosValidos = [
   }
 ];
 
+export function validarLogin(email, password) {
+  return usuariosValidos.find(
+    user => user.email === email && user.password === password
+  );
+}

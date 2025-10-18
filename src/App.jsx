@@ -9,8 +9,6 @@ import Menu2 from "./Pages/Menu2/Menu2.jsx";
 function App() {
   return (
     <BrowserRouter>
-
-      <Header />
       <div className='app-content'>
         <div className='App'>
           <Routes>
@@ -21,6 +19,7 @@ function App() {
         </div>
       </div>
     </BrowserRouter>
+    
   );
 }
 

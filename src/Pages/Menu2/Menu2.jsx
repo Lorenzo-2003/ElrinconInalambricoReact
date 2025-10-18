@@ -3,10 +3,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import CarouselMenu from "./CarouselMenu2";
 import "./Menu2.css";
+import Header from '../../Components/Header';
 
 export default function Menu() {
   return (
     <div>
+      <Header/>
       {/* Carrusel */}
       <CarouselMenu />
 
