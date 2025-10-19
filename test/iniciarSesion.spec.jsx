@@ -1,4 +1,3 @@
-// ...existing code...
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Login from "../src/Pages/IniciarSesion/IniciarSesion.jsx";
@@ -92,4 +91,3 @@ describe("Componente Login (Iniciar Sesión)", () => {
     mockSetItem.mockRestore();
   });
 });
-// ...existing code...
