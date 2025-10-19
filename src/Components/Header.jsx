@@ -1,7 +1,8 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import './Header.css';
+import PeCarro from "./PeCarro"; // <-- añade esto
+
 export default function Menu() {
   return (
     <div className="menu-bg">
@@ -24,10 +25,14 @@ export default function Menu() {
               <li className="nav-item"><Link className="nav-link" to="/cartas">Cartas</Link></li>
               <li className="nav-item"><Link className="nav-link" to="/login">Iniciar sesión</Link></li>
             </ul>
+
+            {/* Aquí añadimos el widget PeCarro a la derecha del nav */}
+            <div className="d-flex align-items-center ms-3">
+              <PeCarro />
+            </div>
           </div>
         </div>
       </nav>
-    
     </div>
   );
 }

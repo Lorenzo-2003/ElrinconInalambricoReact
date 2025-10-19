@@ -1,14 +1,39 @@
+
 export const db = [
-  { id: 1, name: 'Pro X2', image: '/Img/audifono01.jpg', description: 'Lorem ipsum...', price: 199 },
-  { id: 2, name: 'Astro A50', image: '/Img/audifono02.jpg', description: 'Lorem ipsum...', price: 299 },
-  { id: 3, name: 'G735', image: '/Img/audifono03.jpg', description: 'Lorem ipsum...', price: 499 },
-  { id: 4, name: 'G733', image: '/Img/audifono04.jpg', description: 'Lorem ipsum...', price: 399 },
-  { id: 5, name: 'Astro A40', image: '/Img/audifono05.jpg', description: 'Lorem ipsum...', price: 259 },
-  { id: 6, name: 'Astro A20', image: '/Img/audifono06.jpg', description: 'Lorem ipsum...', price: 170 },
-  { id: 7, name: 'Astro A10', image: '/Img/audifono07.jpg', description: 'Lorem ipsum...', price: 120 },
-  { id: 8, name: 'Astro A10', image: '/Img/audifono08.jpg', description: 'Lorem ipsum...', price: 130 },
-  { id: 9, name: 'G335', image: '/Img/audifono09.jpg', description: 'Lorem ipsum...', price: 100 },
-  { id: 10, name: 'G635', image: '/Img/audifono10.jpg', description: 'Lorem ipsum...', price: 295 },
-  { id: 11, name: 'G633', image: '/Img/audifono11.jpg', description: 'Lorem ipsum...', price: 399 },
-  { id: 12, name: 'Astro A40 TR', image: '/Img/audifono12.jpg', description: 'Lorem ipsum...', price: 499 },
+  {
+    id: "test-1",
+    name: "Producto de prueba 1",
+    img: "/Img/placeholder.jpg",
+    image: "placeholder",
+    price: 1000,
+    priceStr: "$1.000",
+    details: ["Detalle 1", "Detalle 2"],
+    category: "test",
+    headerClass: "bg-primary text-white",
+    btnClass: "btn-primary"
+  },
+  {
+    id: "test-2",
+    name: "Producto de prueba 2",
+    img: "/Img/placeholder2.jpg",
+    image: "placeholder2",
+    price: 2000,
+    priceStr: "$2.000",
+    details: ["Detalle A", "Detalle B"],
+    category: "test",
+    headerClass: "bg-secondary text-white",
+    btnClass: "btn-secondary"
+  },
+  {
+  id: "uno-1",
+  name: "Juego UNO (Pack)",
+  img: "/Img/uno.jpg",
+  image: "uno",
+  price: 8000,
+  priceStr: "$8.000",
+  details: ["2-10 jugadores", "Edad 7+"],
+  category: "juego",
+  headerClass: "bg-danger text-white",
+  btnClass: "btn-danger"
+}
 ];

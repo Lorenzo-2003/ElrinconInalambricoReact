@@ -1,6 +1,8 @@
 import React from "react";
 import CardProduct from "../../Components/CardProduct";
-import "./EstilodePaginas.css"; 
+import useCart from "../../hooks/Carrito";
+import "./EstilodePaginas.css";
+
 const PRODUCTS = [
   {
     id: "c-1",
@@ -15,13 +17,32 @@ const PRODUCTS = [
 ];
 
 export default function Consolas() {
+  const { addToCart } = useCart();
+
+  const parsePrice = (price) => {
+    if (typeof price === "number") return price;
+    return Number(String(price).replace(/[^0-9]/g, "")) || 0;
+  };
+
   return (
     <main className="paginas container my-5" aria-labelledby="consolas-heading">
       <h1 id="consolas-heading">Consolas</h1>
       <section className="row row-cols-1 row-cols-md-3 g-4 mt-3" aria-live="polite">
         {PRODUCTS.map(p => (
           <div className="col" key={p.id}>
-            <CardProduct {...p} />
+            <CardProduct
+              {...p}
+              onAdd={() => {
+                console.log("DEBUG Consolas.jsx: addToCart ->", addToCart, "product:", p);
+                addToCart({
+                  id: p.id,
+                  name: p.title,
+                  image: p.img,
+                  price: parsePrice(p.price)
+                });
+                console.log("DEBUG Consolas.jsx: addToCart called");
+              }}
+            />
           </div>
         ))}
       </section>

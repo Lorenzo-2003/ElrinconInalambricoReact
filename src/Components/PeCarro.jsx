@@ -1,15 +1,10 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import useCart from "../hooks/useCart";
+import useCart from "../hooks/Carrito"; 
 
-/**
- * PeCarro - widget del carrito
- * - Usa tu hook useCart (data + hook pattern)
- * - Badge con totalItems
- * - Dropdown con resumen, controles (+, -, eliminar)
- * - Responsive básico y click fuera para cerrar
- */
 export default function PeCarro() {
+  console.log("PeCarro: render / useCart hook will be used");
   const {
     cart,
     totalItems,
@@ -36,10 +31,8 @@ export default function PeCarro() {
     n.toLocaleString("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
 
   const getImgSrc = (img) => {
-    if (!img) return "/img/carrito.png";
-   
-    if (img.startsWith("/")) return img;
-
+    if (!img) return "/Img/Carrito3.jpg";
+    if (img.startsWith("/")) return img; // si ya es ruta absoluta como '/Img/archivo.jpg'
     if (/\.(jpg|jpeg|png|webp|svg)$/i.test(img)) return `/img/${img}`;
     return `/img/${img}.webp`;
   };
@@ -54,7 +47,7 @@ export default function PeCarro() {
         aria-label="Abrir carrito"
         style={{ color: "inherit", textDecoration: "none" }}
       >
-        <img src="/img/carrito.png" alt="Carrito" style={{ width: 28, height: 28 }} />
+        <img src="/Img/Carrito3.jpg" alt="Carrito" style={{ width: 28, height: 28 }} />
         {totalItems > 0 && (
           <span className="badge bg-danger rounded-pill" style={{ position: "absolute", top: -6, right: -6, fontSize: "0.7rem" }}>
             {totalItems}
@@ -96,10 +89,10 @@ export default function PeCarro() {
                           <small className="text-muted">{formatCurrency((item.price || 0) * (item.quantity || 1))}</small>
                         </div>
                         <div className="d-flex align-items-center gap-2 mt-1">
-                          <button className="btn btn-outline-secondary btn-sm" onClick={() => decreaseQuantity(item.id)}>-</button>
+                          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => decreaseQuantity(item.id)}>-</button>
                           <span className="px-2">{item.quantity}</span>
-                          <button className="btn btn-outline-secondary btn-sm" onClick={() => increaseQuantity(item.id)}>+</button>
-                          <button className="btn btn-sm btn-outline-danger ms-2" onClick={() => removeFromCart(item.id)}>Eliminar</button>
+                          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => increaseQuantity(item.id)}>+</button>
+                          <button type="button" className="btn btn-sm btn-outline-danger ms-2" onClick={() => removeFromCart(item.id)}>Eliminar</button>
                         </div>
                       </div>
                     </li>
@@ -115,7 +108,7 @@ export default function PeCarro() {
 
                 <div className="d-grid gap-2">
                   <Link to="/cart" className="btn btn-primary btn-sm" onClick={() => setOpen(false)}>Ver carrito</Link>
-                  <button className="btn btn-outline-secondary btn-sm" onClick={() => { clearCart(); setOpen(false); }}>Vaciar</button>
+                  <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => { clearCart(); setOpen(false); }}>Vaciar</button>
                 </div>
               </>
             )}

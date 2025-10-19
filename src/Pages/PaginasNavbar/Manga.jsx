@@ -1,37 +1,34 @@
 import React from "react";
 import CardProduct from "../../Components/CardProduct";
-import "./EstilodePaginas.css"; 
+import useCart from "../../hooks/Carrito";
+import "./EstilodePaginas.css";
+
 const PRODUCTS = [
-  {
-    id: "m-1",
-    title: "Jujutsu Kaisen Volumen 2",
-    price: "$14.000",
-    img: "/Img/jujutsuKaisen.jpg",
-    imgAlt: "Portada Jujutsu Kaisen Vol.2",
-    details: ["192 páginas", "Envío dentro de 2 días", "5 Disponibles"],
-    headerClass: "bg-success text-white",
-    btnClass: "btn-success"
-  },
-  {
-    id: "m-2",
-    title: "Naruto Vol.31",
-    price: "$13.000",
-    img: "/Img/Naruto.jpg",
-    imgAlt: "Portada Naruto Vol.31",
-    details: ["200 páginas", "Envío 48 horas"],
-    headerClass: "bg-warning text-white",
-    btnClass: "btn-warning"
-  }
+  { id: "m-1", title: "Jujutsu Kaisen Vol.2", price: "$14.000", img: "/Img/jujutsuKaisen.jpg", details: ["192 páginas"], headerClass: "bg-success text-white", btnClass: "btn-success" }
 ];
 
 export default function Manga() {
+  const { addToCart } = useCart();
+
+  const parsePrice = (price) => {
+    if (typeof price === "number") return price;
+    return Number(String(price).replace(/[^0-9]/g, "")) || 0;
+  };
+
   return (
-    <main className="paginas container my-5" aria-labelledby="mangas-heading">
-      <h1 id="mangas-heading">Mangas</h1>
-      <section className="row row-cols-1 row-cols-md-3 g-4 mt-3" aria-live="polite">
+    <main className="paginas container my-5">
+      <h1>Mangas</h1>
+      <section className="row row-cols-1 row-cols-md-3 g-4 mt-3">
         {PRODUCTS.map(p => (
           <div className="col" key={p.id}>
-            <CardProduct {...p} />
+            <CardProduct
+              {...p}
+              onAdd={() => {
+                console.log("DEBUG Manga.jsx: addToCart ->", addToCart, "product:", p);
+                addToCart({ id: p.id, name: p.title, image: p.img, price: parsePrice(p.price) });
+                console.log("DEBUG Manga.jsx: addToCart called");
+              }}
+            />
           </div>
         ))}
       </section>

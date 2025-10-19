@@ -14,7 +14,7 @@ export default function CardProduct({
   return (
     <article className="card h-100 text-center" aria-labelledby={id ? `${id}-title` : undefined}>
       <figure className="m-0">
-        <img src={img} alt={imgAlt || title} className="card-img-top" />
+        <img src={img} alt={imgAlt || title} className="card-img-top" onError={(e) => { e.currentTarget.src = "/img/placeholder.webp"; }} />
       </figure>
       <header className={`card-header ${headerClass}`}>
         <h3 id={id ? `${id}-title` : undefined} className="h6 mb-0">{title}</h3>
@@ -27,9 +27,19 @@ export default function CardProduct({
           ))}
         </ul>
         <button
-          type="button"
+          type="button"                 // IMPORTANTE: evitar submit por defecto
           className={`btn ${btnClass}`}
-          onClick={onAdd}
+          onClick={() => {
+            if (typeof onAdd === "function") {
+              try {
+                onAdd();
+              } catch (err) {
+                console.error("Error en onAdd:", err);
+              }
+            } else {
+              console.warn("onAdd no está definido para", title);
+            }
+          }}
           aria-label={`Agregar ${title} al carrito`}
         >
           Agregar
