@@ -4,8 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Menu from "./Pages/Menu/Menu";
 import Login from "./Pages/IniciarSesion/IniciarSesion.jsx"; 
 import './App.css';
-import Header from '../src/Components/Header';
 import Menu2 from "./Pages/Menu2/Menu2.jsx";
+import Registrar from './Pages/Registrar/Registrar.jsx';
+
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +16,7 @@ function App() {
             <Route path="/" element={<Menu />} />
             <Route path='/Menu2' element={<Menu2/>} />
             <Route path="/login" element={<Login />} />
+            <Route path="/Registrar" element={<Registrar/>}/>
           </Routes>
         </div>
       </div>
