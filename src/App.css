@@ -1,0 +1,51 @@
+/* App.css: fondo global y layout */
+:root {
+  --header-height: 84px; /* ajustar según tu Header */
+  --card-radius: 12px;
+  --glass-bg: rgba(255,255,255,0.72);
+  --glass-border: rgba(255,255,255,0.45);
+}
+
+.App {
+  min-height: 100vh;
+  background-image: url('/Img/Fondo.jpg'); /* asegúrate: public/Img/Fondo.jpg */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center top;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  color: #111;
+}
+
+/* Overlay sutil para mejorar legibilidad sobre el fondo */
+.App::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.05));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-content {
+  position: relative;
+  z-index: 2;
+  padding-top: calc(var(--header-height) + 24px); /* espacio para header */
+  padding-bottom: 4rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Contenedor general para páginas: mantener ancho cómodo */
+.container-lg {
+  max-width: 1180px;
+}
+
+
+h1 {
+  font-size: 2.4rem;
+  margin-bottom: 1.25rem;
+  font-weight: 700;
+  color: #111;
+}
