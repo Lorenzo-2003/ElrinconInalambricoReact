@@ -2,6 +2,7 @@ import React from "react";
 import CardProduct from "../../Components/CardProduct";
 import useCart from "../../hooks/Carrito";
 import "./EstilodePaginas.css";
+import Header from "../../Components/Header"; // ← Importar Header
 
 const PRODUCTS = [
   {
@@ -25,27 +26,32 @@ export default function Consolas() {
   };
 
   return (
-    <main className="paginas container my-5" aria-labelledby="consolas-heading">
-      <h1 id="consolas-heading">Consolas</h1>
-      <section className="row row-cols-1 row-cols-md-3 g-4 mt-3" aria-live="polite">
-        {PRODUCTS.map(p => (
-          <div className="col" key={p.id}>
-            <CardProduct
-              {...p}
-              onAdd={() => {
-                console.log("DEBUG Consolas.jsx: addToCart ->", addToCart, "product:", p);
-                addToCart({
-                  id: p.id,
-                  name: p.title,
-                  image: p.img,
-                  price: parsePrice(p.price)
-                });
-                console.log("DEBUG Consolas.jsx: addToCart called");
-              }}
-            />
-          </div>
-        ))}
-      </section>
-    </main>
+    <div>
+      {/* Header agregado aquí */}
+      <Header />
+      
+      <main className="paginas container my-5" aria-labelledby="consolas-heading">
+        <h1 id="consolas-heading">Consolas</h1>
+        <section className="row row-cols-1 row-cols-md-3 g-4 mt-3" aria-live="polite">
+          {PRODUCTS.map(p => (
+            <div className="col" key={p.id}>
+              <CardProduct
+                {...p}
+                onAdd={() => {
+                  console.log("DEBUG Consolas.jsx: addToCart ->", addToCart, "product:", p);
+                  addToCart({
+                    id: p.id,
+                    name: p.title,
+                    image: p.img,
+                    price: parsePrice(p.price)
+                  });
+                  console.log("DEBUG Consolas.jsx: addToCart called");
+                }}
+              />
+            </div>
+          ))}
+        </section>
+      </main>
+    </div>
   );
 }

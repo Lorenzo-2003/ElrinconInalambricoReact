@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import CarouselMenu from "./CarouselMenu";
 import "./Menu.css";
 import useCart from "../../hooks/Carrito";
+import Header from "../../Components/Header.jsx";
+
+
 
 export default function Menu() {
   const { addToCart } = useCart();
@@ -14,6 +17,7 @@ export default function Menu() {
 
   return (
     <div>
+      <Header/>
       {/* Carrusel */}
       <CarouselMenu />
 
