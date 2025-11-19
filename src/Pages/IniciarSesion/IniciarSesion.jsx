@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usuariosValidos } from './iniciarSesion.js';
 import './iniciarSesion.css';
+import Header from "../../Components/Header"; // ← Importación agregada
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -34,8 +35,8 @@ export default function Login() {
 
   return (
     <div className="menu-bg" style={{minHeight: '100vh'}}>
-      {/* USA el Header importado */}
-      
+      {/* Header agregado aquí */}
+      <Header />
       
       <div className="login-container">
         <div className="login-box">

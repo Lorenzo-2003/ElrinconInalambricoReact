@@ -3,7 +3,6 @@ import './Registrar.css';
 import Header from '../../Components/Header';
 import { Link } from 'react-router-dom';
 
-
 const Registrar = () => {
     const [formData, setFormData] = useState({
         nombre: '',
@@ -19,10 +18,22 @@ const Registrar = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        
+        // Validación en tiempo real solo para teléfono
+        if (name === 'telefono') {
+            // Solo permitir números, o campo vacío (ya que es opcional)
+            if (value === '' || /^\d*$/.test(value)) {
+                setFormData(prevState => ({
+                    ...prevState,
+                    [name]: value
+                }));
+            }
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
         
         // Limpiar error del campo cuando el usuario empiece a escribir
         if (errors[name]) {
@@ -51,6 +62,13 @@ const Registrar = () => {
             newErrors.email = 'Ingresa un correo electrónico válido';
         }
 
+        // Validar teléfono (solo si no está vacío)
+        if (formData.telefono.trim() !== '') {
+            if (!/^\d+$/.test(formData.telefono)) {
+                newErrors.telefono = 'El teléfono solo puede contener números';
+            }
+        }
+
         if (!formData.password) {
             newErrors.password = 'La contraseña es requerida';
         } else if (formData.password.length < 8) {
@@ -65,7 +83,8 @@ const Registrar = () => {
 
         return newErrors;
     };
-    //validacion del contenido del gmail
+
+    // Validación del contenido del email
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -104,7 +123,9 @@ const Registrar = () => {
     };
 
     return (
-    <div className="menu-bg" style={{minHeight: '100vh'}}>
+        <div className="menu-bg" style={{minHeight: '100vh'}}>
+                  <Header/>
+
             <div className="registrar-box">
                 <h1 className="registrar-title">Crear Cuenta</h1>
                 
@@ -159,10 +180,11 @@ const Registrar = () => {
                             type="tel"
                             id="telefono"
                             name="telefono"
-                            className="form-control"
+                            className={`form-control ${errors.telefono ? 'is-invalid' : ''}`}
                             value={formData.telefono}
                             onChange={handleChange}
                         />
+                        {errors.telefono && <div className="invalid-feedback">{errors.telefono}</div>}
                     </div>
                     
                     <div className="form-group">
