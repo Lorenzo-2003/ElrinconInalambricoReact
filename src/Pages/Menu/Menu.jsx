@@ -40,7 +40,14 @@ export default function Menu() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => {
+                  onClick={(e) => {
+                    // quick UI guard: use a data attribute to prevent duplicate clicks
+                    // while keeping the button visually enabled.
+                    const btn = e.currentTarget;
+                    if (btn.dataset.adding === "1") return;
+                    btn.dataset.adding = "1";
+                    btn.setAttribute("aria-busy", "true");
+                    setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
                     console.log("DEBUG Menu.jsx: addToCart (Cartas) ->", addToCart);
                     addToCart({
                       id: "t-1",
@@ -73,7 +80,8 @@ export default function Menu() {
                 <button
                   type="button"
                   className="btn btn-success"
-                  onClick={() => {
+                  onClick={(e) => {
+                    const btn = e.currentTarget; if (btn.dataset.adding === "1") return; btn.dataset.adding = "1"; btn.setAttribute("aria-busy", "true"); setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
                     console.log("DEBUG Menu.jsx: addToCart (Jujutsu) ->", addToCart);
                     addToCart({
                       id: "m-jujutsu-2",
@@ -106,7 +114,8 @@ export default function Menu() {
                 <button
                   type="button"
                   className="btn btn-warning"
-                  onClick={() => {
+                  onClick={(e) => {
+                    const btn = e.currentTarget; if (btn.dataset.adding === "1") return; btn.dataset.adding = "1"; btn.setAttribute("aria-busy", "true"); setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
                     console.log("DEBUG Menu.jsx: addToCart (Xbox) ->", addToCart);
                     addToCart({
                       id: "c-1",
@@ -144,7 +153,8 @@ export default function Menu() {
                 <button
                   type="button"
                   className="btn btn-info"
-                  onClick={() => {
+                  onClick={(e) => {
+                    const btn = e.currentTarget; if (btn.dataset.adding === "1") return; btn.dataset.adding = "1"; btn.setAttribute("aria-busy", "true"); setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
                     console.log("DEBUG Menu.jsx: addToCart (GBA) ->", addToCart);
                     addToCart({
                       id: "gba-1",
@@ -177,7 +187,8 @@ export default function Menu() {
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={() => {
+                  onClick={(e) => {
+                    const btn = e.currentTarget; if (btn.dataset.adding === "1") return; btn.dataset.adding = "1"; btn.setAttribute("aria-busy", "true"); setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
                     console.log("DEBUG Menu.jsx: addToCart (Mini Levi) ->", addToCart);
                     addToCart({
                       id: "f-1",
@@ -210,7 +221,8 @@ export default function Menu() {
                 <button
                   type="button"
                   className="btn btn-dark"
-                  onClick={() => {
+                  onClick={(e) => {
+                    const btn = e.currentTarget; if (btn.dataset.adding === "1") return; btn.dataset.adding = "1"; btn.setAttribute("aria-busy", "true"); setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
                     console.log("DEBUG Menu.jsx: addToCart (PS5) ->", addToCart);
                     addToCart({
                       id: "ps5-std",

@@ -30,6 +30,13 @@
   background: rgba(255,255,255,0.98);
 }
 
+/* keep cards a sensible width and centered when there are few items */
+.paginas .card { /* restore full-width within the column */
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 
 .paginas .card:hover {
   transform: translateY(-8px);
@@ -39,9 +46,12 @@
 .paginas .card-img-top {
   display: block;
   margin: 1.2rem auto 0.6rem;
-  max-height: 360px;
-  width: auto;
-  object-fit: contain;
+  /* fixed visual box for product images so they don't overflow or get strangely cropped */
+  height: 320px;      /* desired visible area for covers */
+  width: auto;        /* keep natural aspect ratio */
+  max-width: 86%;     /* avoid very wide images stretching the layout */
+  object-fit: contain;/* show the whole image inside the box */
+  object-position: center center;
   background: #fff;
   padding: 0.6rem;
   border-radius: 6px;
@@ -86,6 +96,6 @@
 
 @media (max-width: 767px) {
   .paginas.container { padding: 1rem; }
-  .paginas .card-img-top { max-height: 220px; padding: 0.4rem; }
+  .paginas .card-img-top { height: 220px; padding: 0.4rem; }
   .paginas h1 { font-size: 1.6rem; }
 };

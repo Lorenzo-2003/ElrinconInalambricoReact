@@ -38,7 +38,7 @@ export default function Consolas() {
               <CardProduct
                 {...p}
                 onAdd={() => {
-                  console.log("DEBUG Consolas.jsx: addToCart ->", addToCart, "product:", p);
+                  console.log("DEBUG Consolas.jsx: addToCart ->", "product:", p);
                   addToCart({
                     id: p.id,
                     name: p.title,
