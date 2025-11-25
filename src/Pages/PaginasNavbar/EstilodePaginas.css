@@ -1,0 +1,91 @@
+/* EstilodePaginas.css - tarjetas y contenedor mejorados */
+.paginas {
+  padding: 1.5rem 0 3rem;
+}
+
+
+.paginas.container {
+  background: rgba(255,255,255,0.72); 
+  backdrop-filter: blur(6px) saturate(1.05);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.5);
+  padding: 1.5rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(13, 38, 59, 0.06);
+}
+
+.row.row-cols-1.row-cols-md-3.g-4 {
+
+}
+
+
+.paginas .card {
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(13, 38, 59, 0.06);
+  transition: transform .18s ease, box-shadow .18s ease;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.98);
+}
+
+
+.paginas .card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 40px rgba(13, 38, 59, 0.12);
+}
+
+.paginas .card-img-top {
+  display: block;
+  margin: 1.2rem auto 0.6rem;
+  max-height: 360px;
+  width: auto;
+  object-fit: contain;
+  background: #fff;
+  padding: 0.6rem;
+  border-radius: 6px;
+}
+
+
+.paginas .card-header {
+  text-align: center;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  border-radius: 0;
+  color: white;
+}
+
+.paginas .card-title {
+  font-size: 1.1rem;
+  margin-top: 0.4rem;
+  color: #111;
+}
+
+
+.paginas .card-body .price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0.75rem 0;
+}
+
+
+.paginas .list-unstyled li {
+  padding: .6rem 0;
+  border-top: 1px solid rgba(0,0,0,0.04);
+  color: #555;
+}
+
+
+.paginas .btn {
+  min-width: 120px;
+  margin-top: 1rem;
+  border-radius: 8px;
+}
+
+@media (max-width: 767px) {
+  .paginas.container { padding: 1rem; }
+  .paginas .card-img-top { max-height: 220px; padding: 0.4rem; }
+  .paginas h1 { font-size: 1.6rem; }
+};
