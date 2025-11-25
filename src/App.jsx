@@ -3,7 +3,6 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./Components/Header";
 import Menu from "./Pages/Menu/Menu";
-import Menu2 from "./Pages/Menu2/Menu2";
 import Manga from "./Pages/PaginasNavbar/Manga";
 import Figuras from "./Pages/PaginasNavbar/Figuras";
 import Consolas from "./Pages/PaginasNavbar/Consolas";
@@ -19,7 +18,7 @@ export default function App() {
         <main className="app-content">
           <Routes>
             <Route path="/" element={<Menu />} />
-            <Route path="/menu2" element={<Menu2 />} />
+            {/* Removed separate /menu2 route — Menu ahora muestra cambios de Header según estado de sesión */}
             <Route path="/mangas" element={<Manga />} />
             <Route path="/figuras" element={<Figuras />} />
             <Route path="/consolas" element={<Consolas />} />

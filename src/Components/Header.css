@@ -8,6 +8,7 @@ header {
   padding: 0.5rem 0 !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
   border: none !important;
+  min-height: 72px; /* consistent header height */
 }
 
 .navbar-custom .navbar-brand {
@@ -66,6 +67,75 @@ header {
   border: none !important;
 }
 
+/* Ensure container aligns items vertically centered */
+.navbar-custom .container-fluid {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* header actions (cart + user) - default sizes */
+.navbar-custom .header-actions {
+  margin-left: auto;
+  gap: 10px;
+  z-index: 100002; /* above overlay */
+}
+
+.navbar-custom .header-actions .btn {
+  padding: 0.2rem 0.35rem;
+  min-width: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  height: auto !important;
+}
+
+.navbar-custom .header-actions .cart-icon,
+.navbar-custom .header-actions img.user-icon {
+  width: 42px !important;
+  height: 42px !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  display: inline-block !important;
+  vertical-align: middle;
+  max-width: 56px !important;
+  max-height: 56px !important;
+}
+
+.navbar-custom .header-actions .cart-badge {
+  top: -6px !important;
+  right: -6px !important;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.45rem !important;
+}
+
+/* cart dropdown (desktop vs mobile) */
+.cart-dropdown {
+  width: 320px; /* default width */
+  z-index: 100005;
+  right: 0;
+  top: 40px;
+}
+
+/* On larger screens place the dropdown as a fixed block under header and wider */
+@media (min-width: 992px) {
+  .cart-dropdown {
+    position: fixed !important;
+    top: calc(72px + 8px) !important; /* header height + gap */
+    right: 18px !important;
+    width: 360px !important;
+    max-height: 60vh !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+  }
+}
+
+/* small screens: align dropdown under the icon (absolute relative to button) */
+@media (max-width: 991px) {
+  .cart-dropdown { position: absolute !important; right: 0 !important; top: 40px !important; width: 280px; }
+}
+
 /* Responsive */
 @media (max-width: 991px) {
   .navbar-custom .navbar-collapse {
@@ -85,4 +155,112 @@ header {
     width: 50px !important;
     height: 50px !important;
   }
+
+  /* ensure cart and user icon don't overflow on narrow screens */
+  .navbar-custom .d-flex.align-items-center {
+    gap: 8px;
+  }
+
+  /* header-actions handled globally above */
 }
+
+/* small user menu card default styles */
+.user-card {
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 576px) {
+  .brand-text { display: none !important; } /* keep navbar compact */
+  .navbar-custom .nav-link { padding: 0.4rem 0.6rem !important; font-size: 0.92rem !important; }
+}
+
+@media (max-width: 991px) {
+  /* make sure header actions remain visible and fixed near top-right if required */
+  .navbar-custom .header-actions {
+    position: relative;
+    right: 0;
+  }
+}
+
+/* Collapse overlay behaviour on small screens */
+@media (max-width: 991px) {
+  .navbar-custom .navbar-collapse.show {
+    /* keep menu above everything and small enough to interact */
+    display: block !important;
+    position: fixed; /* fixed to break stacking contexts and ensure on top */
+    /* center the menu and avoid full-width appearance */
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94vw, 420px);
+    top: 64px; /* below header (approx). keeps it visible on mobile */
+    z-index: 99999; /* very high to be above carousels */
+    /* white background for legibility */
+    background: #ffffff;
+    padding: 0.5rem 0.6rem;
+    border-radius: 10px;
+    max-width: 420px; /* compact menu on mobile */
+    max-height: 62vh; /* allow scrolling inside the menu */
+    overflow-y: auto;
+    pointer-events: auto;
+  }
+
+  .navbar-custom .navbar-collapse.show .navbar-nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0.25rem 0;
+  }
+
+  .navbar-custom .navbar-collapse.show .navbar-nav .nav-link {
+    padding: 0.6rem 1.2rem !important;
+    display: block;
+    color: #111 !important; /* dark text for readability */
+    font-weight: 600;
+    border-radius: 6px !important;
+  }
+
+  .navbar-custom .navbar-collapse.show .d-flex.align-items-center {
+    justify-content: center;
+    padding-top: 8px;
+  }
+
+  /* when menu is white, use dark strokes for the hamburger icon */
+  .navbar-toggler.open .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23000' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+  }
+
+  /* keep the header itself highest to prevent weird stacking issues */
+  header { z-index: 100000; position: relative; }
+
+  /* ensure links on white overlay have hover state consistent */
+  .navbar-custom .navbar-collapse.show .navbar-nav .nav-link:hover,
+  .navbar-custom .navbar-collapse.show .navbar-nav .nav-link:focus {
+    color: #007bff !important;
+    background-color: rgba(0,0,0,0.03) !important;
+    transform: none !important;
+  }
+
+  /* removed nested breakpoint overrides (moved to global) */
+
+  /* keep toggle button visible and above overlay */
+  .navbar-custom .navbar-toggler {
+    z-index: 10001;
+    position: relative;
+  }
+}
+
+  /* small screen tweak for header actions */
+  @media (max-width: 420px) {
+    .navbar-custom .header-actions .cart-icon { width: 36px !important; height: 36px !important; }
+    .navbar-custom .header-actions .cart-badge { font-size: 0.68rem !important; }
+  }
+
+  /* desktop tweak for header actions */
+  @media (min-width: 992px) {
+    .navbar-custom .header-actions .cart-icon,
+    .navbar-custom .header-actions img.user-icon {
+      width: 44px !important;
+      height: 44px !important;
+    }
+  }
