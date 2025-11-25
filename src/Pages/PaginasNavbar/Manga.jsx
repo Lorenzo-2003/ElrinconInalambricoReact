@@ -5,7 +5,31 @@ import "./EstilodePaginas.css";
 import Header from "../../Components/Header"; // ← Importar Header
 
 const PRODUCTS = [
-  { id: "m-1", title: "Jujutsu Kaisen Vol.2", price: "$14.000", img: "/Img/jujutsuKaisen.jpg", details: ["192 páginas"], headerClass: "bg-success text-white", btnClass: "btn-success" }
+  { 
+    id: "m-1",
+    title: "Jujutsu Kaisen Vol.2", 
+    price: "$14.000", 
+    img: "/Img/jujutsuKaisen.jpg", 
+    details: ["192 páginas"], 
+    headerClass: "bg-success text-white", 
+    btnClass: "btn-success" 
+  },  {
+      id: "m-1",
+    title: "Dragon ball Super Vol.1", 
+    price: "$15.000", 
+    img: "/Img/Dragon ball super Vol18.png", 
+    details: ["192 páginas"], 
+    headerClass: "bg-success text-white", 
+    btnClass: "btn-success" 
+  },{
+        id: "m-1",
+    title: "Komi-san wa Komyushou Desu Vol.5", 
+    price: "$14.000", 
+    img: "/Img/Komi-san.jpg", 
+    details: ["400 páginas"], 
+    headerClass: "bg-success text-white", 
+    btnClass: "btn-success" 
+  }
 ];
 
 export default function Manga() {

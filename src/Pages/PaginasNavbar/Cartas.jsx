@@ -38,7 +38,7 @@ export default function Cartas() {
               <CardProduct
                 {...p}
                 onAdd={() => {
-                  console.log("DEBUG Cartas.jsx: addToCart ->", addToCart, "product:", p);
+                  console.log("DEBUG Cartas.jsx: addToCart ->", "product:", p);
                   addToCart({
                     id: p.id,
                     name: p.title,

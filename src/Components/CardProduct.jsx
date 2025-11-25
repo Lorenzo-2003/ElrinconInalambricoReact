@@ -29,7 +29,15 @@ export default function CardProduct({
         <button
           type="button"                 // IMPORTANTE: evitar submit por defecto
           className={`btn ${btnClass}`}
-          onClick={() => {
+          onClick={(e) => {
+            // UI-friendly guard: mark the button as 'adding' via a data attribute
+            // so we prevent duplicate clicks without visually disabling it.
+            const btn = e.currentTarget;
+            if (btn.dataset.adding === "1") return;
+            btn.dataset.adding = "1";
+            btn.setAttribute("aria-busy", "true");
+            setTimeout(() => { try { btn.removeAttribute("data-adding"); btn.removeAttribute("aria-busy"); } catch (err) {} }, 500);
+
             if (typeof onAdd === "function") {
               try {
                 onAdd();

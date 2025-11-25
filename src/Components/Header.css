@@ -114,7 +114,8 @@ header {
 /* cart dropdown (desktop vs mobile) */
 .cart-dropdown {
   width: 320px; /* default width */
-  z-index: 100005;
+  /* ensure dropdown sits above any transformed stacking contexts (very large z-index) */
+  z-index: 2147483647 !important;
   right: 0;
   top: 40px;
 }

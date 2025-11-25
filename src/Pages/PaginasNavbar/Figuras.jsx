@@ -10,11 +10,29 @@ const PRODUCTS = [
     title: "Figura Mini Levi",
     price: "$25.000",
     img: "/Img/MiniLevi.avif",
-    imgAlt: "Figura Mini Levi",
     details: ["Altura 10cm", "Material PVC", "Edición limitada"],
     headerClass: "bg-secondary text-white",
     btnClass: "btn-secondary"
+  },
+  {
+    id: "f-2",
+    title: "Figura Gojo",
+    price: "$18.000",
+    img: "/Img/Gojo.jpg",
+    details: ["Altura 9cm", "Edición especial"],
+    headerClass: "bg-warning text-white",
+    btnClass: "btn-warning"
+  },
+  {
+    id: "f-3",
+    title: "Figura One Piece [Luffy]",
+    price: "$30.000",
+    img: "/Img/OneFigura.jpg",
+    details: ["PVC", "Altura 15cm"],
+    headerClass: "bg-info text-white",
+    btnClass: "btn-info"
   }
+  
 ];
 
 export default function Figuras() {
@@ -38,7 +56,7 @@ export default function Figuras() {
               <CardProduct
                 {...p}
                 onAdd={() => {
-                  console.log("DEBUG Figuras.jsx: addToCart ->", addToCart, "product:", p);
+                  console.log("DEBUG Figuras.jsx: addToCart ->", "product:", p);
                   addToCart({
                     id: p.id,
                     name: p.title,
