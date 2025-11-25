@@ -47,9 +47,9 @@ export default function PeCarro() {
         aria-label="Abrir carrito"
         style={{ color: "inherit", textDecoration: "none" }}
       >
-        <img src="/Img/Carrito3.jpg" alt="Carrito" style={{ width: 28, height: 28 }} />
-        {totalItems > 0 && (
-          <span className="badge bg-danger rounded-pill" style={{ position: "absolute", top: -6, right: -6, fontSize: "0.7rem" }}>
+        <img src="/Img/Carrito3.jpg" alt="Carrito" className="cart-icon" style={{ width: 44, height: 44 }} />
+          {totalItems > 0 && (
+          <span className="badge bg-danger rounded-pill cart-badge" style={{ position: "absolute", top: -6, right: -6 }}>
             {totalItems}
           </span>
         )}
@@ -57,20 +57,12 @@ export default function PeCarro() {
 
       {open && (
         <div
-          className="card shadow-sm"
-          style={{
-            position: "absolute",
-            right: 0,
-            top: 40,
-            width: 360,
-            zIndex: 2000,
-            maxHeight: 420,
-            overflow: "auto"
-          }}
+          className="card shadow-sm cart-dropdown"
+          style={{ position: "absolute", right: 0, top: 40, maxHeight: 420, overflow: "auto" }}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="card-body p-2">
-            <div className="d-flex justify-content-between align-items-center mb-2">
+                <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="card-title mb-0">Carrito</h6>
               {!isEmpty && <small className="text-muted">{totalItems} items</small>}
             </div>

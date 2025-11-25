@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { usuariosValidos } from './iniciarSesion.js';
 import './iniciarSesion.css';
 import Header from "../../Components/Header"; // ← Importación agregada
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -18,6 +20,9 @@ export default function Login() {
     });
   };
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -26,8 +31,10 @@ export default function Login() {
     );
     
     if (usuarioEncontrado) {
-      localStorage.setItem('usuarioLogueado', JSON.stringify(usuarioEncontrado));
-      window.location.href = './Menu2';
+      // actualizamos el contexto global de autenticación
+      login(usuarioEncontrado);
+      // redirigimos al menú principal (ya no necesitamos una ruta separada)
+      navigate('/');
     } else {
       setError('Email o contraseña incorrectos');
     }

@@ -91,3 +91,10 @@ h1 {
   font-weight: 700;
   color: #111;
 }
+
+/* Turn off fixed background on small screens to avoid painting/scroll issues */
+@media (max-width: 768px) {
+  .App {
+    background-attachment: scroll;
+  }
+}
