@@ -1,0 +1,8 @@
+.cart-page h1 { font-weight: 600; }
+.cart-item-img { width: 88px; height: 88px; object-fit: contain; border-radius: 6px; background: #fff; }
+.cart-page .list-group-item { border-radius: 8px; }
+.cart-page .card { border-radius: 8px; }
+
+@media (max-width: 767px) {
+  .cart-item-img { width: 64px; height: 64px; }
+}

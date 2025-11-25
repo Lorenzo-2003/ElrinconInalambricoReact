@@ -1,0 +1,14 @@
+.perfil-page h1 { font-weight: 100; }
+.perfil-page .card { border-radius: 12px; }
+.perfil-card { max-width: 960px; width: 100%; }
+.perfil-avatar { width: 120px; height: 120px; object-fit: cover; border: 4px solid #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+.perfil-name { font-size: 22px; }
+.perfil-role { font-size: 14px; color: #6b7280; }
+.perfil-page dt { font-weight: 600; }
+.avatar-wrap input[type=file] { max-width: 940px; }
+
+/* Responsive: keep avatar balanced on very small screens */
+@media (max-width: 480px) {
+	.perfil-avatar { width: 90px; height: 90px; }
+	.perfil-card { padding: 1rem; }
+}
