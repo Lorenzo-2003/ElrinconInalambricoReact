@@ -9,6 +9,8 @@ import Consolas from "./Pages/PaginasNavbar/Consolas";
 import Cartas from "./Pages/PaginasNavbar/Cartas";
 import Login from "./Pages/IniciarSesion/IniciarSesion.jsx";
 import Registrar from "./Pages/Registrar/Registrar.jsx";
+import Perfil from "./Pages/Perfil/Perfil";
+import CartPage from "./Pages/Cart/Cart";
 import "./App.css";
 
 export default function App() {
@@ -23,6 +25,8 @@ export default function App() {
             <Route path="/figuras" element={<Figuras />} />
             <Route path="/consolas" element={<Consolas />} />
             <Route path="/cartas" element={<Cartas />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/cart" element={<CartPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registrar" element={<Registrar />} />
           </Routes>

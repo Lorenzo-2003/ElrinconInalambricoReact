@@ -50,9 +50,6 @@ export default function useCart() {
   }, [syncFromStorage]);
 
   function addToCart(item) {
-    // Global operation lock to prevent two nearly-simultaneous addToCart calls
-    // from different hook instances producing a double-add.
-    // Use a short lock window (200ms) to allow subsequent legitimate clicks.
     try {
       window.__cartOperationLock = window.__cartOperationLock || { locked: false };
       if (window.__cartOperationLock.locked) {
