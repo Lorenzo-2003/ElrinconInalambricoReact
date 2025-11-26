@@ -14,15 +14,15 @@ const PRODUCTS = [
     headerClass: "bg-success text-white", 
     btnClass: "btn-success" 
   },  {
-      id: "m-1",
+      id: "m-2",
     title: "Dragon ball Super Vol.1", 
     price: "$15.000", 
     img: "/Img/Dragon ball super Vol18.png", 
     details: ["192 páginas"], 
     headerClass: "bg-success text-white", 
     btnClass: "btn-success" 
-  },{
-        id: "m-1",
+    },{
+      id: "m-3",
     title: "Komi-san wa Komyushou Desu Vol.5", 
     price: "$14.000", 
     img: "/Img/Komi-san.jpg", 
