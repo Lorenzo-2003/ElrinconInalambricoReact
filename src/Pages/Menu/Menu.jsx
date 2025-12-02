@@ -26,7 +26,7 @@ export default function Menu() {
         <div className="row row-cols-1 row-cols-md-3 g-4">
           <div className="col">
             <div className="card h-100 text-center">
-              <img src="/Img/cartasPkm.jpg" alt="CartasPkm" />
+              <img src="/Img/cartaspkm.jpg" alt="CartasPkm" />
               <div className="card-header bg-primary text-white">
                 Cartas Brecha Paradojica
               </div>

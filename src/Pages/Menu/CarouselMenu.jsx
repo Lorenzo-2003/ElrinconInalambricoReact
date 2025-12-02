@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import "../../Components/Header.css";
 
 const carouselImages = [
-  { src: "/Img/Cartas.jpg", alt: "Cartas" },
-  { src: "/Img/consolas.png", alt: "Consolas" },
-  { src: "/Img/Naruto.jpg", alt: "Naruto" },
-];
+   { src: "/Img/cartas mitos y leyendas.webp", alt: "Cartas" },
+   { src: "/Img/consolas.png", alt: "Consolas" },
+   { src: "/Img/manga naruto.jpg", alt: "Naruto" },
+ ];
 
 export default function CarouselMenu() {
   const [index, setIndex] = useState(1);
