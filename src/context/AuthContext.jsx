@@ -5,7 +5,8 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
-      const raw = localStorage.getItem('usuarioLogueado');
+      // CAMBIA ESTA LÍNEA: de 'usuarioLogueado' a 'usuario'
+      const raw = localStorage.getItem('usuario');
       return raw ? JSON.parse(raw) : null;
     } catch (e) {
       return null;
@@ -13,8 +14,12 @@ export const AuthProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    if (user) localStorage.setItem('usuarioLogueado', JSON.stringify(user));
-    else localStorage.removeItem('usuarioLogueado');
+    if (user) {
+      // CAMBIA ESTA LÍNEA también
+      localStorage.setItem('usuario', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('usuario');
+    }
   }, [user]);
 
   const login = (userData) => setUser(userData);
