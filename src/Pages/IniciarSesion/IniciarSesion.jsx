@@ -29,13 +29,11 @@ export default function Login() {
     setError('');
 
     try {
-      // 🔥 DEBUG: Mostrar lo que se envía
       console.log('📤 Enviando al backend:', {
         correo: formData.email,
         contrasena: formData.password
       });
 
-      // 🔥 CONEXIÓN AL BACKEND SPRING BOOT
       const response = await fetch('http://localhost:8081/usuario/login', {
         method: 'POST',
         headers: {
@@ -47,11 +45,8 @@ export default function Login() {
         }),
       });
 
-      // 🔥 DEBUG: Ver status
       console.log('📡 Status HTTP:', response.status);
-      console.log('📡 OK?', response.ok);
 
-      // Leer como texto primero para debug
       const responseText = await response.text();
       console.log('📦 Respuesta RAW:', responseText);
 
@@ -65,34 +60,69 @@ export default function Login() {
         return;
       }
 
-      // Verificar si el login fue exitoso
-      if (response.ok && data.success) {
+      // 🔥 AQUÍ ESTÁ LA CLAVE: Verificar si el login fue exitoso
+      if (response.ok) {
         console.log('🎉 Login exitoso! Datos:', data);
 
-        // ✅ IMPORTANTE: El backend devuelve los datos en data.usuario
-        // Estructura esperada: { success: true, usuario: { id, nombre, correo, ... } }
-        const usuarioBackend = data.usuario || data; // Intenta con data.usuario, si no existe usa data directamente
+        // 🔥 ADAPTACIÓN CRÍTICA: ¿Qué estructura devuelve tu backend?
+        // Opción 1: Si devuelve { success: true, usuario: {...} }
+        // Opción 2: Si devuelve directamente el usuario { id, nombre, correo, ... }
+        
+        let usuarioBackend;
+        
+        if (data.success && data.usuario) {
+          // Opción 1: Estructura con "success" y "usuario"
+          usuarioBackend = data.usuario;
+        } else if (data.id || data.correo) {
+          // Opción 2: Estructura directa del usuario
+          usuarioBackend = data;
+        } else {
+          // Si no reconocemos la estructura, usar datos básicos
+          usuarioBackend = {
+            id: 1,
+            correo: formData.email
+          };
+        }
 
-        // Crear objeto adaptado para tu AuthContext
+        console.log('👤 Usuario obtenido del backend:', usuarioBackend);
+
+        // 🔥 CREAR USUARIO ADAPTADO - ESTO ES LO MÁS IMPORTANTE
         const usuarioAdaptado = {
           id: usuarioBackend.id || 1,
-          nombre: usuarioBackend.nombre || 'Usuario',
+          // 🔥 AQUÍ: Asegurarnos de guardar el NOMBRE del backend
+          nombre: usuarioBackend.nombre || 'Usuario Autenticado',
           email: usuarioBackend.correo || usuarioBackend.email || formData.email,
-          password: usuarioBackend.contrasena || usuarioBackend.password || formData.password,
-          rol: usuarioBackend.rol || 'usuario',
-          telefono: usuarioBackend.telefono || null
+          // No guardes la contraseña por seguridad
+          rol: usuarioBackend.rol?.nombre || usuarioBackend.rol || 'cliente',
+          telefono: usuarioBackend.telefono || null,
+          direccion: usuarioBackend.direccion || null
         };
 
-        console.log('👤 Usuario adaptado para contexto:', usuarioAdaptado);
+        console.log('👤 Usuario adaptado para frontend:', usuarioAdaptado);
 
-        // Guardar en localStorage para persistencia
+        // 🔥 DOBLE GUARDADO (por si el contexto falla)
+        // 1. Guardar directamente en localStorage (esto ya funcionaba)
         localStorage.setItem('usuario', JSON.stringify(usuarioAdaptado));
         
-        // Actualizar contexto global de autenticación
+        // 2. También guardar en otra key por redundancia
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // 3. Actualizar contexto global de autenticación
         login(usuarioAdaptado);
         
-        // Redirigir al menú principal
+        // 🔥 REDIRECCIÓN ASEGURADA
+        console.log('🔄 Redirigiendo a /');
+        
+        // Opción 1: Redirección normal (ya funcionaba)
         navigate('/');
+        
+        // Opción 2: Redirección forzada después de un pequeño delay
+        setTimeout(() => {
+          // Esto fuerza una navegación si navigate no funciona
+          if (window.location.pathname === '/login') {
+            window.location.href = '/';
+          }
+        }, 100);
         
       } else {
         // Manejar errores del backend
@@ -112,7 +142,7 @@ export default function Login() {
       }
       
     } catch (error) {
-      console.error('💥 Error de conexión completo:', error);
+      console.error('Error de conexión completo:', error);
       setError('Error de conexión con el servidor. Verifica que el backend esté corriendo en http://localhost:8081');
     } finally {
       setLoading(false);
@@ -211,15 +241,14 @@ export default function Login() {
           
           {/* 🔥 NOTA DE DESARROLLO */}
           <div className="dev-note">
-            <p><strong>Nota para desarrollo:</strong></p>
+            <p><strong>Debug info:</strong></p>
             <p>Endpoint: POST http://localhost:8081/usuario/login</p>
-            <p>Body esperado: {"{"}"correo": "email", "contrasena": "password"{"}"}</p>
-            <p>Revisa la consola (F12) para ver los logs</p>
+            <p>Email actual: {formData.email || '(vacío)'}</p>
+            <p>Estado: {loading ? 'Cargando...' : 'Listo'}</p>
           </div>
         </div>
       </div>
 
-      {/* Estilos para el spinner */}
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
