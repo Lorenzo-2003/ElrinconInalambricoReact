@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Registrar = () => {
     const [formData, setFormData] = useState({
+        rut: '',
         nombre: '',
         apellido: '',
         email: '',
@@ -29,6 +30,15 @@ const Registrar = () => {
                     [name]: value
                 }));
             }
+        } else if (name === 'rut') {
+            // Para RUT: Permitir números, puntos, guión y K/k
+            const cleanedValue = value.toUpperCase();
+            if (cleanedValue === '' || /^[0-9\.\-Kk]*$/.test(cleanedValue)) {
+                setFormData(prevState => ({
+                    ...prevState,
+                    [name]: cleanedValue
+                }));
+            }
         } else {
             setFormData(prevState => ({
                 ...prevState,
@@ -50,12 +60,23 @@ const Registrar = () => {
     const validateForm = () => {
         const newErrors = {};
 
+        // 🔥 VALIDACIÓN DE RUT (NUEVO)
+        if (!formData.rut.trim()) {
+            newErrors.rut = 'El RUT es requerido';
+        } else if (!isValidRUT(formData.rut)) {
+            newErrors.rut = 'Ingresa un RUT válido (ej: 12.345.678-9)';
+        }
+
         if (!formData.nombre.trim()) {
             newErrors.nombre = 'El nombre es requerido';
+        } else if (formData.nombre.trim().length < 2) {
+            newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
         }
 
         if (!formData.apellido.trim()) {
             newErrors.apellido = 'El apellido es requerido';
+        } else if (formData.apellido.trim().length < 2) {
+            newErrors.apellido = 'El apellido debe tener al menos 2 caracteres';
         }
 
         if (!formData.email.trim()) {
@@ -77,6 +98,8 @@ const Registrar = () => {
             newErrors.password = 'La contraseña es requerida';
         } else if (formData.password.length < 8) {
             newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
+        } else if (!/(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+            newErrors.password = 'Debe contener al menos una mayúscula y un número';
         }
 
         if (!formData.confirmPassword) {
@@ -93,6 +116,76 @@ const Registrar = () => {
         return emailRegex.test(email);
     };
 
+    // 🔥 FUNCIÓN PARA VALIDAR RUT CHILENO (opcional, puedes ajustar)
+    const isValidRUT = (rut) => {
+        // Limpiar el RUT
+        const cleanRut = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+        
+        if (cleanRut.length < 8 || cleanRut.length > 10) {
+            return false;
+        }
+        
+        // Separar número y dígito verificador
+        const rutNumber = cleanRut.slice(0, -1);
+        const dv = cleanRut.slice(-1);
+        
+        // Validar que el número sea numérico
+        if (!/^\d+$/.test(rutNumber)) {
+            return false;
+        }
+        
+        // Validar dígito verificador (0-9 o K)
+        if (!/^[0-9K]$/.test(dv)) {
+            return false;
+        }
+        
+        return true; // Para desarrollo, aceptamos cualquier formato válido
+        // Para producción, podrías agregar el algoritmo de validación completo
+    };
+
+    // 🔥 FUNCIÓN PARA FORMATEAR RUT AL TYPING
+    const formatRUT = (value) => {
+        // Remover todo excepto números y K
+        const clean = value.replace(/[^0-9Kk]/g, '').toUpperCase();
+        
+        if (clean.length === 0) return '';
+        
+        // Formatear: XX.XXX.XXX-X
+        let formatted = clean;
+        if (clean.length > 1) {
+            // Insertar puntos
+            let parts = [];
+            let numbers = clean.slice(0, -1);
+            let dv = clean.slice(-1);
+            
+            // Insertar puntos cada 3 dígitos desde el final
+            for (let i = numbers.length; i > 0; i -= 3) {
+                parts.unshift(numbers.slice(Math.max(0, i - 3), i));
+            }
+            
+            formatted = parts.join('.') + '-' + dv;
+        }
+        
+        return formatted;
+    };
+
+    const handleRUTChange = (e) => {
+        const rawValue = e.target.value;
+        const formatted = formatRUT(rawValue);
+        
+        setFormData(prevState => ({
+            ...prevState,
+            rut: formatted
+        }));
+        
+        if (errors.rut) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                rut: ''
+            }));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -104,35 +197,30 @@ const Registrar = () => {
             try {
                 // 🔥 MAPEO DE DATOS: Frontend → Backend
                 const usuarioBackend = {
-                    // Tu backend NO tiene "apellido", combinamos nombre + apellido
-                    nombre: `${formData.nombre} ${formData.apellido}`.trim(),
+                    // RUT ahora viene del formulario
+                    rut: formData.rut.trim(),
                     
-                    // Tu backend usa "correo", no "email"
-                    correo: formData.email,
+                    // Nombre completo (nombre + apellido combinados)
+                    nombre: `${formData.nombre.trim()} ${formData.apellido.trim()}`,
                     
-                    // Tu backend usa "contrasena", no "password"
+                    // email → correo
+                    correo: formData.email.trim(),
+                    
+                    // password → contrasena
                     contrasena: formData.password,
                     
-                    // Teléfono: convertir string a número (o null si está vacío)
+                    // Teléfono como número (0 si está vacío)
                     telefono: formData.telefono ? parseInt(formData.telefono) : 0,
                     
-                    // RUT: Tu backend lo requiere pero frontend no lo pide
-                    // Podemos generar uno temporal o hacerlo opcional
-                    // OPCION 1: Dejar vacío (si tu BD lo permite)
-                    // OPCION 2: Generar uno temporal
-                    rut: `temp-${Date.now()}`, // Temporal, luego el usuario deberá actualizar
-                    
-                    // Rol: Por defecto asignamos rol "cliente" (necesitas el ID del rol)
-                    // Esto depende de cómo tengas los roles en tu BD
+                    // Rol (obligatorio en backend)
                     rol: {
-                        id: 2, // Asumiendo que ID 2 = "cliente", ID 1 = "admin"
-                        nombre: "cliente"
+                        id: 2  // ID para rol "cliente"
                     }
                 };
 
-                console.log('Enviando a backend:', usuarioBackend);
+                console.log('📤 Enviando a backend:', usuarioBackend);
+                console.log('🔗 URL: http://localhost:8081/usuario');
 
-                // 🔥 CONEXIÓN AL BACKEND SPRING BOOT
                 const response = await fetch('http://localhost:8081/usuario', {
                     method: 'POST',
                     headers: {
@@ -141,37 +229,57 @@ const Registrar = () => {
                     body: JSON.stringify(usuarioBackend),
                 });
 
+                console.log('📥 Respuesta del servidor:', response.status);
+
                 if (response.ok) {
-                    const usuarioCreado = await response.json();
-                    console.log('Usuario registrado en backend:', usuarioCreado);
+                    try {
+                        const usuarioCreado = await response.json();
+                        console.log('✅ Usuario registrado exitosamente:', usuarioCreado);
+                        
+                        alert(`¡Bienvenido ${formData.nombre}! Tu cuenta ha sido creada exitosamente.`);
+                        
+                        // Limpiar formulario
+                        setFormData({
+                            rut: '',
+                            nombre: '',
+                            apellido: '',
+                            email: '',
+                            telefono: '',
+                            password: '',
+                            confirmPassword: ''
+                        });
+                        
+                        // Redirigir a login después de 2 segundos
+                        setTimeout(() => {
+                            navigate('/login');
+                        }, 2000);
+                        
+                    } catch (jsonError) {
+                        console.error('❌ Error parseando JSON:', jsonError);
+                        alert('✅ Registro exitoso (respuesta no JSON)');
+                        setTimeout(() => navigate('/login'), 2000);
+                    }
                     
-                    alert(`¡Usuario ${usuarioCreado.nombre} registrado exitosamente!`);
-                    
-                    // Limpiar formulario
-                    setFormData({
-                        nombre: '',
-                        apellido: '',
-                        email: '',
-                        telefono: '',
-                        password: '',
-                        confirmPassword: ''
-                    });
-                    
-                    // Redirigir a login
-                    navigate('/login');
-                    
-                } else if (response.status === 400) {
-                    const errorData = await response.json();
-                    setBackendError(errorData.message || 'Error en los datos enviados');
-                } else if (response.status === 409) {
-                    setBackendError('El correo electrónico ya está registrado');
                 } else {
-                    setBackendError('Error en el servidor. Intenta nuevamente.');
+                    const errorText = await response.text();
+                    console.error('❌ Error del backend:', response.status, errorText);
+                    
+                    if (errorText.includes('Data too long for column') || errorText.includes('truncation')) {
+                        setBackendError('Error: El RUT es demasiado largo. Máximo 12 caracteres.');
+                    } else if (response.status === 409) {
+                        setBackendError('El correo electrónico ya está registrado');
+                    } else if (response.status === 400) {
+                        setBackendError('Datos inválidos. Verifica la información ingresada.');
+                    } else if (response.status === 500 && errorText.includes('rut')) {
+                        setBackendError('Error con el RUT. Verifica el formato (ej: 12.345.678-9)');
+                    } else {
+                        setBackendError(`Error del servidor (${response.status}): ${errorText}`);
+                    }
                 }
                 
             } catch (error) {
-                console.error('Error de conexión:', error);
-                setBackendError('Error de conexión con el servidor. Verifica que el backend esté corriendo.');
+                console.error('❌ Error de conexión:', error);
+                setBackendError('No se pudo conectar con el servidor.');
             }
         } else {
             setErrors(formErrors);
@@ -187,14 +295,40 @@ const Registrar = () => {
             <div className="registrar-box">
                 <h1 className="registrar-title">Crear Cuenta</h1>
                 
-                {/* 🔥 Mostrar error del backend */}
                 {backendError && (
-                    <div className="alert alert-danger" style={{marginBottom: '20px'}}>
-                        {backendError}
+                    <div className="alert alert-danger" style={{
+                        marginBottom: '20px',
+                        padding: '10px 15px',
+                        backgroundColor: '#f8d7da',
+                        color: '#721c24',
+                        border: '1px solid #f5c6cb',
+                        borderRadius: '4px',
+                        whiteSpace: 'pre-line'
+                    }}>
+                        ⚠️ {backendError}
                     </div>
                 )}
                 
                 <form onSubmit={handleSubmit} id="registerForm">
+                    {/* 🔥 NUEVO CAMPO: RUT */}
+                    <div className="form-group">
+                        <label htmlFor="rut">RUT</label>
+                        <input
+                            type="text"
+                            id="rut"
+                            name="rut"
+                            className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
+                            value={formData.rut}
+                            onChange={handleRUTChange}
+                            placeholder="Ej: 12.345.678-9"
+                            required
+                        />
+                        {errors.rut && <div className="invalid-feedback">{errors.rut}</div>}
+                        <div className="rut-requirements" style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
+                            Formato: 12.345.678-9 (con puntos y guión)
+                        </div>
+                    </div>
+                    
                     <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="nombre">Nombre</label>
@@ -205,6 +339,7 @@ const Registrar = () => {
                                 className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
                                 value={formData.nombre}
                                 onChange={handleChange}
+                                placeholder="Ej: Juan"
                                 required
                             />
                             {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
@@ -219,6 +354,7 @@ const Registrar = () => {
                                 className={`form-control ${errors.apellido ? 'is-invalid' : ''}`}
                                 value={formData.apellido}
                                 onChange={handleChange}
+                                placeholder="Ej: Pérez"
                                 required
                             />
                             {errors.apellido && <div className="invalid-feedback">{errors.apellido}</div>}
@@ -234,6 +370,7 @@ const Registrar = () => {
                             className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                             value={formData.email}
                             onChange={handleChange}
+                            placeholder="ejemplo@correo.com"
                             required
                         />
                         {errors.email && <div className="invalid-feedback">{errors.email}</div>}
@@ -265,12 +402,14 @@ const Registrar = () => {
                             required
                         />
                         {errors.password && <div className="invalid-feedback">{errors.password}</div>}
-                        <div className="password-requirements">La contraseña debe tener al menos 8 caracteres</div>
+                        <div className="password-requirements">
+                            La contraseña debe tener al menos 8 caracteres, una mayúscula y un número
+                        </div>
                     </div>
                     
                     <div className="form-group">
                         <label htmlFor="confirmPassword">Confirmar contraseña</label>
-                        <input
+                            <input
                             type="password"
                             id="confirmPassword"
                             name="confirmPassword"
@@ -286,8 +425,17 @@ const Registrar = () => {
                         type="submit" 
                         className="btn-registrar"
                         disabled={isSubmitting}
+                        style={{
+                            opacity: isSubmitting ? 0.7 : 1,
+                            cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                        }}
                     >
-                        {isSubmitting ? 'Registrando...' : 'Registrarse'}
+                        {isSubmitting ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                Registrando...
+                            </>
+                        ) : 'Registrarse'}
                     </button>
                 </form>
                 
@@ -295,22 +443,30 @@ const Registrar = () => {
                     ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
                 </div>
                 
-                {/* 🔥 Información para desarrollo */}
-                <div style={{
+                {/* 🔥 Para debugging */}
+                <details style={{
                     marginTop: '20px',
                     padding: '10px',
                     backgroundColor: '#f8f9fa',
                     borderRadius: '5px',
-                    fontSize: '11px',
-                    color: '#666',
-                    textAlign: 'left'
+                    fontSize: '12px',
+                    color: '#666'
                 }}>
-                    <p><strong>Información técnica:</strong></p>
-                    <p><strong>Backend URL:</strong> http://localhost:8080/usuario</p>
-                    <p><strong>Campo "nombre" en backend:</strong> "{formData.nombre} {formData.apellido}"</p>
-                    <p><strong>Campo "correo" en backend:</strong> {formData.email}</p>
-                    <p><strong>Campo "telefono" en backend:</strong> {formData.telefono || '0'}</p>
-                </div>
+                    <summary>Debug: Ver datos que se enviarán al backend</summary>
+                    <pre style={{whiteSpace: 'pre-wrap', marginTop: '10px', fontSize: '11px'}}>
+                        {JSON.stringify({
+                            rut: formData.rut,
+                            nombre: `${formData.nombre} ${formData.apellido}`,
+                            correo: formData.email,
+                            contrasena: '[PROTEGIDO]',
+                            telefono: formData.telefono || '0',
+                            rol: { id: 2 }
+                        }, null, 2)}
+                    </pre>
+                    <div style={{marginTop: '10px', fontSize: '11px'}}>
+                        <strong>Endpoint:</strong> http://localhost:8081/usuario
+                    </div>
+                </details>
             </div>
         </div>
     );
