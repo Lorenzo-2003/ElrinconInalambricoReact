@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
-import { db } from "../data/db";
+import { db } from "../Data/db";
 
 const STORAGE_KEY = "cart";
 

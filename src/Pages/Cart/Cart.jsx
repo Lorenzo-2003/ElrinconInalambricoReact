@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useCart from '../../hooks/Carrito';
 import Header from '../../Components/Header';
 import './Cart.css';
 
 export default function CartPage() {
-  const { cart, totalItems, cartTotal, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, isEmpty } = useCart();
+   const { cart, totalItems, cartTotal, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, isEmpty } = useCart();
+   const navigate = useNavigate();
 
   const formatCurrency = (n) => n.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
 
@@ -67,7 +68,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="d-grid gap-2">
-                    <button className="btn btn-primary">Ir a pagar</button>
+                    <button className="btn btn-primary" onClick={() => navigate('/payment')}>Ir a pagar</button>
                     <button className="btn btn-outline-secondary" onClick={() => clearCart()}>Vaciar carrito</button>
                     <Link to="/" className="btn btn-link">Seguir comprando</Link>
                   </div>
