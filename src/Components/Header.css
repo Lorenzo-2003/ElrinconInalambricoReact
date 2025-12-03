@@ -44,6 +44,26 @@ header {
   transform: translateY(-2px) !important;
 }
 
+/* 🔥 ESTILOS ESPECIALES PARA ENLACES DE ADMIN */
+.navbar-custom .nav-link[href*="/admin/"] {
+  background-color: rgba(231, 76, 60, 0.15) !important;
+  border-left: 3px solid #e74c3c !important;
+  position: relative;
+  font-weight: 600 !important;
+}
+
+.navbar-custom .nav-link[href*="/admin/"]:hover,
+.navbar-custom .nav-link[href*="/admin/"]:focus {
+  background-color: rgba(231, 76, 60, 0.3) !important;
+  color: #ffeb3b !important;
+}
+
+.navbar-custom .nav-link[href*="/admin/"]::before {
+  content: '⚡';
+  margin-right: 5px;
+  font-size: 0.9em;
+}
+
 .navbar-custom .navbar-toggler {
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   background-color: transparent !important;
@@ -56,6 +76,27 @@ header {
 .navbar-custom .navbar-toggler:focus {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5) !important;
   outline: none !important;
+}
+
+/* 🔥 BADGE PARA ADMIN EN EL LOGO */
+.navbar-custom .admin-badge {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white !important;
+  font-size: 0.6rem !important;
+  padding: 2px 8px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  animation: pulse-admin 2s infinite !important;
+}
+
+@keyframes pulse-admin {
+  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
 }
 
 /* Eliminar cualquier borde o línea blanca */
@@ -137,6 +178,31 @@ header {
   .cart-dropdown { position: absolute !important; right: 0 !important; top: 40px !important; width: 280px; }
 }
 
+/* 🔥 BANNER DE ADMIN */
+.admin-banner {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+  color: white !important;
+  padding: 8px 0 !important;
+  font-size: 14px !important;
+  border-bottom: 2px solid #e74c3c !important;
+}
+
+.admin-banner a {
+  color: #ecf0f1 !important;
+  text-decoration: none !important;
+  transition: color 0.3s !important;
+  margin: 0 10px !important;
+}
+
+.admin-banner a:hover {
+  color: #3498db !important;
+  text-decoration: underline !important;
+}
+
+.admin-banner strong {
+  color: #e74c3c !important;
+}
+
 /* Responsive */
 @media (max-width: 991px) {
   .navbar-custom .navbar-collapse {
@@ -163,6 +229,13 @@ header {
   }
 
   /* header-actions handled globally above */
+  
+  /* 🔥 ENLACES DE ADMIN EN MÓVIL */
+  .navbar-custom .nav-link[href*="/admin/"] {
+    background-color: rgba(231, 76, 60, 0.2) !important;
+    border-left: 3px solid #e74c3c !important;
+    margin: 3px 0 !important;
+  }
 }
 
 /* small user menu card default styles */
@@ -174,6 +247,11 @@ header {
 @media (max-width: 576px) {
   .brand-text { display: none !important; } /* keep navbar compact */
   .navbar-custom .nav-link { padding: 0.4rem 0.6rem !important; font-size: 0.92rem !important; }
+  
+  /* 🔥 OCULTAR BANNER DE ADMIN EN MÓVIL */
+  .admin-banner {
+    display: none !important;
+  }
 }
 
 @media (max-width: 991px) {
@@ -220,6 +298,13 @@ header {
     font-weight: 600;
     border-radius: 6px !important;
   }
+  
+  /* 🔥 ENLACES DE ADMIN EN EL MENÚ DESPLEGABLE */
+  .navbar-custom .navbar-collapse.show .navbar-nav .nav-link[href*="/admin/"] {
+    color: #e74c3c !important;
+    background-color: rgba(231, 76, 60, 0.1) !important;
+    border-left: 3px solid #e74c3c !important;
+  }
 
   .navbar-custom .navbar-collapse.show .d-flex.align-items-center {
     justify-content: center;
@@ -241,6 +326,13 @@ header {
     background-color: rgba(0,0,0,0.03) !important;
     transform: none !important;
   }
+  
+  /* 🔥 HOVER ESPECIAL PARA ENLACES DE ADMIN */
+  .navbar-custom .navbar-collapse.show .navbar-nav .nav-link[href*="/admin/"]:hover,
+  .navbar-custom .navbar-collapse.show .navbar-nav .nav-link[href*="/admin/"]:focus {
+    color: #c0392b !important;
+    background-color: rgba(231, 76, 60, 0.2) !important;
+  }
 
   /* removed nested breakpoint overrides (moved to global) */
 
@@ -251,17 +343,47 @@ header {
   }
 }
 
-  /* small screen tweak for header actions */
-  @media (max-width: 420px) {
-    .navbar-custom .header-actions .cart-icon { width: 36px !important; height: 36px !important; }
-    .navbar-custom .header-actions .cart-badge { font-size: 0.68rem !important; }
+/* small screen tweak for header actions */
+@media (max-width: 420px) {
+  .navbar-custom .header-actions .cart-icon { width: 36px !important; height: 36px !important; }
+  .navbar-custom .header-actions .cart-badge { font-size: 0.68rem !important; }
+  
+  /* 🔥 REDUCIR BADGE DE ADMIN EN PANTALLAS MUY PEQUEÑAS */
+  .navbar-custom .admin-badge {
+    font-size: 0.5rem !important;
+    padding: 1px 5px !important;
+    margin-left: 4px !important;
   }
+}
 
-  /* desktop tweak for header actions */
-  @media (min-width: 992px) {
-    .navbar-custom .header-actions .cart-icon,
-    .navbar-custom .header-actions img.user-icon {
-      width: 44px !important;
-      height: 44px !important;
-    }
+/* desktop tweak for header actions */
+@media (min-width: 992px) {
+  .navbar-custom .header-actions .cart-icon,
+  .navbar-custom .header-actions img.user-icon {
+    width: 44px !important;
+    height: 44px !important;
   }
+  
+  /* 🔥 BANNER DE ADMIN SOLO EN DESKTOP */
+  .admin-banner {
+    display: block !important;
+  }
+}
+
+/* 🔥 ESTILOS PARA DISPOSITIVOS MUY PEQUEÑOS */
+@media (max-width: 380px) {
+  .navbar-custom .navbar-brand img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .navbar-custom .brand-text {
+    font-size: 0.9rem !important;
+  }
+  
+  /* 🔥 OCULTAR TEXTO "ADMIN" EN PANTALLAS MUY PEQUEÑAS, SOLO MOSTRAR BADGE */
+  .navbar-custom .admin-badge {
+    padding: 1px 3px !important;
+    font-size: 0.4rem !important;
+  }
+}

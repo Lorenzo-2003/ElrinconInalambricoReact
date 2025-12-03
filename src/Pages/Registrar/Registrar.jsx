@@ -60,7 +60,7 @@ const Registrar = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        // 🔥 VALIDACIÓN DE RUT (NUEVO)
+        // 
         if (!formData.rut.trim()) {
             newErrors.rut = 'El RUT es requerido';
         } else if (!isValidRUT(formData.rut)) {
@@ -116,7 +116,7 @@ const Registrar = () => {
         return emailRegex.test(email);
     };
 
-    // 🔥 FUNCIÓN PARA VALIDAR RUT CHILENO (opcional, puedes ajustar)
+    // 
     const isValidRUT = (rut) => {
         // Limpiar el RUT
         const cleanRut = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
@@ -139,11 +139,10 @@ const Registrar = () => {
             return false;
         }
         
-        return true; // Para desarrollo, aceptamos cualquier formato válido
-        // Para producción, podrías agregar el algoritmo de validación completo
+        return true;
     };
 
-    // 🔥 FUNCIÓN PARA FORMATEAR RUT AL TYPING
+    // 
     const formatRUT = (value) => {
         // Remover todo excepto números y K
         const clean = value.replace(/[^0-9Kk]/g, '').toUpperCase();
@@ -187,106 +186,105 @@ const Registrar = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setBackendError('');
+    e.preventDefault();
+    setIsSubmitting(true);
+    setBackendError('');
 
-        const formErrors = validateForm();
-        
-        if (Object.keys(formErrors).length === 0) {
-            try {
-                // 🔥 MAPEO DE DATOS: Frontend → Backend
-                const usuarioBackend = {
-                    // RUT ahora viene del formulario
-                    rut: formData.rut.trim(),
-                    
-                    // Nombre completo (nombre + apellido combinados)
-                    nombre: `${formData.nombre.trim()} ${formData.apellido.trim()}`,
-                    
-                    // email → correo
-                    correo: formData.email.trim(),
-                    
-                    // password → contrasena
-                    contrasena: formData.password,
-                    
-                    // Teléfono como número (0 si está vacío)
-                    telefono: formData.telefono ? parseInt(formData.telefono) : 0,
-                    
-                    // Rol (obligatorio en backend)
-                    rol: {
-                        id: 2  // ID para rol "cliente"
-                    }
-                };
+    const formErrors = validateForm();
+    
+    if (Object.keys(formErrors).length === 0) {
+        try {
+            // 
+            const usuarioBackend = {
+                rut: formData.rut.trim(),
+                nombre: `${formData.nombre.trim()} ${formData.apellido.trim()}`,
+                correo: formData.email.trim(),
+                contrasena: formData.password,
+                telefono: formData.telefono || null,  // ← Como String o null
+            };
 
-                console.log('📤 Enviando a backend:', usuarioBackend);
-                console.log('🔗 URL: http://localhost:8081/usuario');
+            console.log('📤 Enviando a backend:', usuarioBackend);
+            console.log('🎯 El backend asignará rol según email:', formData.email);
 
-                const response = await fetch('http://localhost:8081/usuario', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(usuarioBackend),
-                });
+            // 🔥 CONEXIÓN AL BACKEND
+            const response = await fetch('http://localhost:8081/usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(usuarioBackend),
+            });
 
-                console.log('📥 Respuesta del servidor:', response.status);
+            console.log('📥 Respuesta del servidor - Status:', response.status);
 
-                if (response.ok) {
-                    try {
-                        const usuarioCreado = await response.json();
-                        console.log('✅ Usuario registrado exitosamente:', usuarioCreado);
-                        
-                        alert(`¡Bienvenido ${formData.nombre}! Tu cuenta ha sido creada exitosamente.`);
-                        
-                        // Limpiar formulario
-                        setFormData({
-                            rut: '',
-                            nombre: '',
-                            apellido: '',
-                            email: '',
-                            telefono: '',
-                            password: '',
-                            confirmPassword: ''
-                        });
-                        
-                        // Redirigir a login después de 2 segundos
-                        setTimeout(() => {
-                            navigate('/login');
-                        }, 2000);
-                        
-                    } catch (jsonError) {
-                        console.error('❌ Error parseando JSON:', jsonError);
-                        alert('✅ Registro exitoso (respuesta no JSON)');
-                        setTimeout(() => navigate('/login'), 2000);
-                    }
+            if (response.ok) {
+                try {
+                    const usuarioCreado = await response.json();
+                    console.log('✅ Usuario registrado exitosamente:', usuarioCreado);
                     
-                } else {
-                    const errorText = await response.text();
-                    console.error('❌ Error del backend:', response.status, errorText);
-                    
-                    if (errorText.includes('Data too long for column') || errorText.includes('truncation')) {
-                        setBackendError('Error: El RUT es demasiado largo. Máximo 12 caracteres.');
-                    } else if (response.status === 409) {
-                        setBackendError('El correo electrónico ya está registrado');
-                    } else if (response.status === 400) {
-                        setBackendError('Datos inválidos. Verifica la información ingresada.');
-                    } else if (response.status === 500 && errorText.includes('rut')) {
-                        setBackendError('Error con el RUT. Verifica el formato (ej: 12.345.678-9)');
+                    // Mostrar mensaje según el rol que se asignó
+                    let mensaje = '';
+                    if (formData.email.includes('@admin.') || formData.email.startsWith('admin@')) {
+                        mensaje = `¡Administrador ${formData.nombre} registrado exitosamente!`;
                     } else {
-                        setBackendError(`Error del servidor (${response.status}): ${errorText}`);
+                        mensaje = `¡Bienvenido ${formData.nombre}! Tu cuenta de usuario ha sido creada.`;
                     }
+                    
+                    alert(mensaje);
+                    
+                    // Limpiar formulario
+                    setFormData({
+                        rut: '',
+                        nombre: '',
+                        apellido: '',
+                        email: '',
+                        telefono: '',
+                        password: '',
+                        confirmPassword: ''
+                    });
+                    
+                    // Redirigir a login después de 2 segundos
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 2000);
+                    
+                } catch (jsonError) {
+                    console.error(' Error parseando JSON:', jsonError);
+                    // Aún así, mostrar éxito si el status fue 200
+                    alert(' Registro exitoso');
+                    setTimeout(() => navigate('/login'), 2000);
                 }
                 
-            } catch (error) {
-                console.error('❌ Error de conexión:', error);
-                setBackendError('No se pudo conectar con el servidor.');
+            } else {
+                const errorText = await response.text();
+                console.error(' Error del backend:', response.status, errorText);
+                
+                // Manejar errores específicos
+                if (errorText.includes('Data too long for column') || errorText.includes('truncation')) {
+                    setBackendError('Error: El RUT es demasiado largo. Máximo 12 caracteres.');
+                } else if (response.status === 409) {
+                    setBackendError('El correo electrónico ya está registrado');
+                } else if (response.status === 400) {
+                    setBackendError('Datos inválidos. Verifica la información ingresada.');
+                } else if (response.status === 500 && errorText.includes('rut')) {
+                    setBackendError('Error con el RUT. Verifica el formato (ej: 12.345.678-9)');
+                } else if (response.status === 500 && errorText.includes('rol') || errorText.includes('Rol')) {
+                    setBackendError('Error al asignar rol. ¿Existen los roles en la BD?');
+                } else {
+                    setBackendError(`Error del servidor (${response.status}): ${errorText.substring(0, 200)}`);
+                }
             }
-        } else {
-            setErrors(formErrors);
+            
+        } catch (error) {
+            console.error(' Error de conexión:', error);
+            setBackendError('No se pudo conectar con el servidor. Verifica que el backend esté corriendo.');
         }
-        
-        setIsSubmitting(false);
-    };
+    } else {
+        setErrors(formErrors);
+    }
+    
+    setIsSubmitting(false);
+};
 
     return (
         <div className="menu-bg" style={{minHeight: '100vh'}}>
@@ -309,8 +307,9 @@ const Registrar = () => {
                     </div>
                 )}
                 
+
+                
                 <form onSubmit={handleSubmit} id="registerForm">
-                    {/* 🔥 NUEVO CAMPO: RUT */}
                     <div className="form-group">
                         <label htmlFor="rut">RUT</label>
                         <input
@@ -409,7 +408,7 @@ const Registrar = () => {
                     
                     <div className="form-group">
                         <label htmlFor="confirmPassword">Confirmar contraseña</label>
-                            <input
+                        <input
                             type="password"
                             id="confirmPassword"
                             name="confirmPassword"
@@ -443,7 +442,7 @@ const Registrar = () => {
                     ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
                 </div>
                 
-                {/* 🔥 Para debugging */}
+                
                 <details style={{
                     marginTop: '20px',
                     padding: '10px',
@@ -460,11 +459,15 @@ const Registrar = () => {
                             correo: formData.email,
                             contrasena: '[PROTEGIDO]',
                             telefono: formData.telefono || '0',
-                            rol: { id: 2 }
+                            rol_id: formData.email.includes('@admin.') || formData.email.startsWith('admin@') ? 1 : 4,
+                            rol_asignado: formData.email.includes('@admin.') || formData.email.startsWith('admin@') ? 'admin (ID 1)' : 'usuario (ID 4)'
                         }, null, 2)}
                     </pre>
                     <div style={{marginTop: '10px', fontSize: '11px'}}>
-                        <strong>Endpoint:</strong> http://localhost:8081/usuario
+                        <strong>Endpoint:</strong> POST http://localhost:8081/usuario
+                    </div>
+                    <div style={{marginTop: '5px', fontSize: '11px'}}>
+                        <strong>Rol detectado:</strong> {formData.email.includes('@admin.') || formData.email.startsWith('admin@') ? 'ADMIN (ID 1)' : 'USUARIO (ID 4)'}
                     </div>
                 </details>
             </div>
