@@ -29,7 +29,7 @@ export default function Menu() {
           <div className="col">
             <div className="card h-100 shadow-sm">
               <div className="card-img-container">
-                <img src="/Img/cartaspkm.jpg" className="card-img-top" alt="Cartas Pokémon Brecha Paradójica" />
+                <img src="/Img/cartasPkm.jpg" className="card-img-top" alt="Cartas Pokémon Brecha Paradójica" />
               </div>
               <div className="card-header bg-primary text-white text-center">
                 <h5 className="card-title mb-0">Cartas Brecha Paradójica</h5>
@@ -78,7 +78,7 @@ export default function Menu() {
           <div className="col">
             <div className="card h-100 shadow-sm">
               <div className="card-img-container">
-                <img src="/Img/jujutsuKaisen.jpg" className="card-img-top" alt="Jujutsu Kaisen Volumen 2" />
+                <img src="/Img/jujutsu kaisen.jpg" className="card-img-top" alt="Jujutsu Kaisen Volumen 2" />
               </div>
               <div className="card-header bg-success text-white text-center">
                 <h5 className="card-title mb-0">Manga Jujutsu Kaisen Vol. 2</h5>
@@ -127,7 +127,7 @@ export default function Menu() {
           <div className="col">
             <div className="card h-100 shadow-sm">
               <div className="card-img-container">
-                <img src="/Img/XboxX.png" className="card-img-top" alt="Xbox Series X" />
+                <img src="/Img/xbox one.png" className="card-img-top" alt="Xbox Series X" />
               </div>
               <div className="card-header bg-warning text-white text-center">
                 <h5 className="card-title mb-0">Xbox Series X</h5>
@@ -331,7 +331,7 @@ export default function Menu() {
           <div className="col">
             <div className="card h-100 shadow-sm">
               <div className="card-img-container">
-                <img src="/Img/Gojo.jpg" className="card-img-top" alt="Figura Gojo" />
+                <img src="/Img/figura gojo.jpg" className="card-img-top" alt="Figura Gojo" />
               </div>
               <div className="card-header bg-danger text-white text-center">
                 <h5 className="card-title mb-0">Figura Gojo</h5>
