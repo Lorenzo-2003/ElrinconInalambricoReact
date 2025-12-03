@@ -1,0 +1,83 @@
+.menu-bg {
+  background-image: url('/Img/Fondo.jpg');
+  background-repeat: no-repeat;
+  /* avoid fixed backgrounds on mobile where it causes issues */
+  background-attachment: scroll;
+  background-position: center;
+  background-size: cover;     
+  min-height: 100vh;          
+  width: 100%;               
+  margin: 0;
+  padding: 0;
+}
+.carousel-img {
+  transition: all 0.4s;
+  margin: 0 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  object-fit: cover;
+}
+.navbar-custom {
+  background: rgba(179,157,219,0.92);
+  backdrop-filter: blur(2px);
+}
+
+.center-img {
+  /* use fluid sizing but cap at a comfortable max */
+  width: min(45vw, 320px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  z-index: 2;
+}
+.small-img {
+  width: min(24vw, 180px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  opacity: 0.85;
+  z-index: 1;
+}
+.card{
+  max-width: 100%;
+  width: 220px; /* base size inside grid, will wrap naturally */
+  margin-left: auto;
+  margin-right: auto;
+}
+.card img{
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* When screen is narrow: stack carousel images vertically, make cards use full width */
+@media (max-width: 768px) {
+  .carousel-images {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .center-img { width: min(70vw, 260px); }
+  .small-img { width: min(40vw, 160px); }
+
+  .card { width: 100%; max-width: 420px; }
+}
+
+@media (max-width: 480px) {
+  /* ensure the small devices don't overflow */
+  .center-img { width: min(80vw, 220px); }
+  .small-img { width: min(60vw, 140px); }
+  .carousel-img { margin: 0 6px; }
+}
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card-link:hover .card {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  transform: scale(1.03);
+  transition: 0.2s;
+}
+.text-center{
+  text-align: center;
+}

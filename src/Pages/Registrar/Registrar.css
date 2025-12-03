@@ -1,0 +1,150 @@
+/* Reset y fuentes */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor principal */
+.registrar-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Caja del formulario */
+.registrar-box {
+  background: rgb(255, 255, 255);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Título */
+.registrar-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+    font-weight: bold;
+    font-size: 1.8rem;
+}
+
+/* Fila de formulario para nombre y apellido */
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Grupos de formulario */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Etiquetas */
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 500;
+}
+
+/* Campos de entrada */
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #aa2ecf;
+    box-shadow: 0 0 0 2px rgba(170, 46, 207, 0.2);
+}
+
+/* Estados de validación */
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Botón de registro */
+.btn-registrar {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(150deg, #690981, #480f8f);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.btn-registrar:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.btn-registrar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Enlaces */
+.registrar-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.registrar-links a {
+    color: #aa2ecf;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.registrar-links a:hover {
+    text-decoration: underline;
+}
+
+/* Texto opcional */
+.optional {
+    color: #888;
+    font-style: italic;
+    font-weight: normal;
+}
+
+/* Requisitos de contraseña */
+.password-requirements {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .registrar-box {
+        padding: 1.5rem;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
