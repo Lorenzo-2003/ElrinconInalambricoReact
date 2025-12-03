@@ -48,77 +48,72 @@ export default function Login() {
       console.log('📡 Status HTTP:', response.status);
 
       const responseText = await response.text();
-      console.log('📦 Respuesta RAW:', responseText);
+      console.log('📦 Respuesta RAW del backend:', responseText);
 
       let data;
       try {
         data = JSON.parse(responseText);
-        console.log('✅ JSON parseado:', data);
+        console.log('✅ JSON parseado del backend:', data);
       } catch (parseError) {
         console.error('❌ No es JSON válido:', responseText);
         setError('Error: El servidor devolvió una respuesta inválida');
         return;
       }
 
-      // 🔥 AQUÍ ESTÁ LA CLAVE: Verificar si el login fue exitoso
+      // 🔥 VERIFICAR SI EL LOGIN FUE EXITOSO
       if (response.ok) {
-        console.log('🎉 Login exitoso! Datos:', data);
+        console.log('🎉 Login exitoso! Datos completos del backend:', data);
 
-        // 🔥 ADAPTACIÓN CRÍTICA: ¿Qué estructura devuelve tu backend?
-        // Opción 1: Si devuelve { success: true, usuario: {...} }
-        // Opción 2: Si devuelve directamente el usuario { id, nombre, correo, ... }
+        // 🔥 CLAVE: MAPEAR rol_id A NOMBRE DE ROL
+        // Solo dos roles: admin (ID 1) y usuario (ID 4)
+        // Según tu tabla: 1=admin, 4=Usuario
         
-        let usuarioBackend;
+        const roleMap = {
+          1: 'admin',           // ID 1 = admin
+          4: 'usuario'          // ID 4 = usuario
+        };
         
-        if (data.success && data.usuario) {
-          // Opción 1: Estructura con "success" y "usuario"
-          usuarioBackend = data.usuario;
-        } else if (data.id || data.correo) {
-          // Opción 2: Estructura directa del usuario
-          usuarioBackend = data;
-        } else {
-          // Si no reconocemos la estructura, usar datos básicos
-          usuarioBackend = {
-            id: 1,
-            correo: formData.email
-          };
-        }
+        // Obtener el nombre del rol basado en rol_id
+        const rolId = data.rol_id || 4; // Default a usuario (ID 4)
+        const rolNombre = roleMap[rolId] || 'usuario';
+        
+        console.log(`🔍 Rol detectado: ID ${rolId} → "${rolNombre}"`);
+        console.log(`👤 Usuario: ${data.nombre} (${data.correo})`);
 
-        console.log('👤 Usuario obtenido del backend:', usuarioBackend);
-
-        // 🔥 CREAR USUARIO ADAPTADO - ESTO ES LO MÁS IMPORTANTE
+        // 🔥 CREAR USUARIO ADAPTADO PARA FRONTEND
         const usuarioAdaptado = {
-          id: usuarioBackend.id || 1,
-          // 🔥 AQUÍ: Asegurarnos de guardar el NOMBRE del backend
-          nombre: usuarioBackend.nombre || 'Usuario Autenticado',
-          email: usuarioBackend.correo || usuarioBackend.email || formData.email,
-          // No guardes la contraseña por seguridad
-          rol: usuarioBackend.rol?.nombre || usuarioBackend.rol || 'cliente',
-          telefono: usuarioBackend.telefono || null,
-          direccion: usuarioBackend.direccion || null
+          id: data.id || 1,
+          nombre: data.nombre || 'Usuario',
+          email: data.correo || formData.email,
+          // 🔥 ESTO ES LO MÁS IMPORTANTE: Asignar rol correctamente
+          rol: rolNombre,
+          rol_id: rolId, // Guardar también el ID
+          telefono: data.telefono || null,
+          direccion: data.direccion || null
         };
 
         console.log('👤 Usuario adaptado para frontend:', usuarioAdaptado);
+        console.log(`✅ ${usuarioAdaptado.nombre} es ${usuarioAdaptado.rol}`);
 
-        // 🔥 DOBLE GUARDADO (por si el contexto falla)
-        // 1. Guardar directamente en localStorage (esto ya funcionaba)
+        // 🔥 GUARDAR EN LOCALSTORAGE Y CONTEXTO
         localStorage.setItem('usuario', JSON.stringify(usuarioAdaptado));
-        
-        // 2. También guardar en otra key por redundancia
         localStorage.setItem('isLoggedIn', 'true');
         
-        // 3. Actualizar contexto global de autenticación
+        // Debug: verificar que se guardó
+        const savedUser = localStorage.getItem('usuario');
+        console.log('💾 Guardado en localStorage:', savedUser);
+        
+        // Actualizar contexto
         login(usuarioAdaptado);
         
-        // 🔥 REDIRECCIÓN ASEGURADA
+        // 🔥 REDIRECCIÓN
         console.log('🔄 Redirigiendo a /');
         
-        // Opción 1: Redirección normal (ya funcionaba)
+        // Redirección principal
         navigate('/');
         
-        // Opción 2: Redirección forzada después de un pequeño delay
+        // Redirección forzada como backup
         setTimeout(() => {
-          // Esto fuerza una navegación si navigate no funciona
           if (window.location.pathname === '/login') {
             window.location.href = '/';
           }
@@ -137,13 +132,13 @@ export default function Login() {
         } else if (data.error) {
           setError(data.error);
         } else {
-          setError('Error en el servidor. Intenta nuevamente.');
+          setError(`Error del servidor (${response.status})`);
         }
       }
       
     } catch (error) {
       console.error('Error de conexión completo:', error);
-      setError('Error de conexión con el servidor. Verifica que el backend esté corriendo en http://localhost:8081');
+      setError('No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8081');
     } finally {
       setLoading(false);
     }
@@ -239,12 +234,9 @@ export default function Login() {
             </p>
           </div>
           
-          {/* 🔥 NOTA DE DESARROLLO */}
           <div className="dev-note">
-            <p><strong>Debug info:</strong></p>
-            <p>Endpoint: POST http://localhost:8081/usuario/login</p>
-            <p>Email actual: {formData.email || '(vacío)'}</p>
-            <p>Estado: {loading ? 'Cargando...' : 'Listo'}</p>
+
+            
           </div>
         </div>
       </div>
