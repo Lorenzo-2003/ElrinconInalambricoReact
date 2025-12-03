@@ -54,6 +54,7 @@ export const apiService = {
 
   // Pago microservice
   pago: {
+<<<<<<< HEAD
     syncCartToDatabase: async (cart, userId) => {
       console.log('🛒 API: Syncing cart to database, cart:', cart, 'userId:', userId);
 
@@ -91,11 +92,15 @@ export const apiService = {
 
     createFactura: async (facturaData) => {
       console.log('📡 API: Sending factura data:', facturaData);
+=======
+    createFactura: async (facturaData) => {
+>>>>>>> cfc082e8c5e9642a7a46833d1d9a33d097e68cc9
       const response = await fetch(`http://localhost:8083/factura`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(facturaData)
       });
+<<<<<<< HEAD
       console.log('📡 API: Response status:', response.status);
       console.log('📡 API: Response ok:', response.ok);
 
@@ -120,6 +125,16 @@ export const apiService = {
       const result = await response.json();
       console.log('📡 API: Fpago success:', result);
       return result;
+=======
+      if (!response.ok) throw new Error('Error creating invoice');
+      return response.json();
+    },
+
+    getFpagos: async () => {
+      const response = await fetch(`http://localhost:8083/fpago`);
+      if (!response.ok) throw new Error('Error fetching payment methods');
+      return response.json();
+>>>>>>> cfc082e8c5e9642a7a46833d1d9a33d097e68cc9
     }
   }
 };
