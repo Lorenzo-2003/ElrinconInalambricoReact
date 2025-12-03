@@ -14,10 +14,10 @@ export default function Figuras() {
    // Function to add default images based on product names
    const addDefaultImages = (products) => {
      const nameToImageMap = {
-       "Figura de Rem": "/Img/remfigura.jpeg",
-       "Figura de Death Note": "/Img/deathfigura.jpg",
+       "Figura de Rem": "/Img/RemFigura.jpeg",
+       "Figura de Death Note": "/Img/DeathFigura.jpg",
        "Figura de Demon Slayer": "/Img/figura rengoku.jpg",
-       "Figura de One Punch Man": "/Img/onepunch.jpg",
+       "Figura de One Punch Man": "/Img/MiniLevi.avif",
        "Figura de Jujutsu Kaisen": "/Img/figura gojo.jpg",
        "Spy x Family": "/Img/figuraspyxfamily.jpg",
        "Haikyuu": "/Img/Figura Haikyuu.jpg",

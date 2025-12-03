@@ -11,6 +11,7 @@ import Login from "./Pages/IniciarSesion/IniciarSesion.jsx";
 import Registrar from "./Pages/Registrar/Registrar.jsx";
 import Perfil from "./Pages/Perfil/Perfil";
 import CartPage from "./Pages/Cart/Cart";
+import Payment from "./Pages/Payment/Payment";
 import "./App.css";
 
 export default function App() {
@@ -19,17 +20,18 @@ export default function App() {
       <div className="App">
         <main className="app-content">
           <Routes>
-            <Route path="/" element={<Menu />} />
-            {/* Removed separate /menu2 route — Menu ahora muestra cambios de Header según estado de sesión */}
-            <Route path="/mangas" element={<Manga />} />
-            <Route path="/figuras" element={<Figuras />} />
-            <Route path="/consolas" element={<Consolas />} />
-            <Route path="/cartas" element={<Cartas />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/registrar" element={<Registrar />} />
-          </Routes>
+           <Route path="/" element={<Menu />} />
+           {/* Removed separate /menu2 route — Menu ahora muestra cambios de Header según estado de sesión */}
+           <Route path="/mangas" element={<Manga />} />
+           <Route path="/figuras" element={<Figuras />} />
+           <Route path="/consolas" element={<Consolas />} />
+           <Route path="/cartas" element={<Cartas />} />
+           <Route path="/perfil" element={<Perfil />} />
+           <Route path="/cart" element={<CartPage />} />
+           <Route path="/payment" element={<Payment />} />
+           <Route path="/login" element={<Login />} />
+           <Route path="/registrar" element={<Registrar />} />
+         </Routes>
         </main>
       </div>
     </BrowserRouter>

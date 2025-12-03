@@ -29,11 +29,13 @@ export default function Login() {
     setError('');
 
     try {
+      // 🔥 DEBUG: Mostrar lo que se envía
       console.log('📤 Enviando al backend:', {
         correo: formData.email,
         contrasena: formData.password
       });
 
+      // 🔥 CONEXIÓN AL BACKEND SPRING BOOT
       const response = await fetch('http://localhost:8081/usuario/login', {
         method: 'POST',
         headers: {
@@ -45,79 +47,52 @@ export default function Login() {
         }),
       });
 
+      // 🔥 DEBUG: Ver status
       console.log('📡 Status HTTP:', response.status);
+      console.log('📡 OK?', response.ok);
 
+      // Leer como texto primero para debug
       const responseText = await response.text();
-      console.log('📦 Respuesta RAW del backend:', responseText);
+      console.log('📦 Respuesta RAW:', responseText);
 
       let data;
       try {
         data = JSON.parse(responseText);
-        console.log('✅ JSON parseado del backend:', data);
+        console.log('✅ JSON parseado:', data);
       } catch (parseError) {
         console.error('❌ No es JSON válido:', responseText);
         setError('Error: El servidor devolvió una respuesta inválida');
         return;
       }
 
-      // 🔥 VERIFICAR SI EL LOGIN FUE EXITOSO
-      if (response.ok) {
-        console.log('🎉 Login exitoso! Datos completos del backend:', data);
+      // Verificar si el login fue exitoso
+      if (response.ok && data.success) {
+        console.log('🎉 Login exitoso! Datos:', data);
 
-        // 🔥 CLAVE: MAPEAR rol_id A NOMBRE DE ROL
-        // Solo dos roles: admin (ID 1) y usuario (ID 4)
-        // Según tu tabla: 1=admin, 4=Usuario
-        
-        const roleMap = {
-          1: 'admin',           // ID 1 = admin
-          4: 'usuario'          // ID 4 = usuario
-        };
-        
-        // Obtener el nombre del rol basado en rol_id
-        const rolId = data.rol_id || 4; // Default a usuario (ID 4)
-        const rolNombre = roleMap[rolId] || 'usuario';
-        
-        console.log(`🔍 Rol detectado: ID ${rolId} → "${rolNombre}"`);
-        console.log(`👤 Usuario: ${data.nombre} (${data.correo})`);
+        // ✅ IMPORTANTE: El backend devuelve los datos en data.usuario
+        // Estructura esperada: { success: true, usuario: { id, nombre, correo, ... } }
+        const usuarioBackend = data.usuario || data; // Intenta con data.usuario, si no existe usa data directamente
 
-        // 🔥 CREAR USUARIO ADAPTADO PARA FRONTEND
+        // Crear objeto adaptado para tu AuthContext
         const usuarioAdaptado = {
-          id: data.id || 1,
-          nombre: data.nombre || 'Usuario',
-          email: data.correo || formData.email,
-          // 🔥 ESTO ES LO MÁS IMPORTANTE: Asignar rol correctamente
-          rol: rolNombre,
-          rol_id: rolId, // Guardar también el ID
-          telefono: data.telefono || null,
-          direccion: data.direccion || null
+          id: usuarioBackend.id || 1,
+          nombre: usuarioBackend.nombre || 'Usuario',
+          email: usuarioBackend.correo || usuarioBackend.email || formData.email,
+          password: usuarioBackend.contrasena || usuarioBackend.password || formData.password,
+          rol: usuarioBackend.rol || 'usuario',
+          telefono: usuarioBackend.telefono || null
         };
 
-        console.log('👤 Usuario adaptado para frontend:', usuarioAdaptado);
-        console.log(`✅ ${usuarioAdaptado.nombre} es ${usuarioAdaptado.rol}`);
+        console.log('👤 Usuario adaptado para contexto:', usuarioAdaptado);
 
-        // 🔥 GUARDAR EN LOCALSTORAGE Y CONTEXTO
+        // Guardar en localStorage para persistencia
         localStorage.setItem('usuario', JSON.stringify(usuarioAdaptado));
-        localStorage.setItem('isLoggedIn', 'true');
         
-        // Debug: verificar que se guardó
-        const savedUser = localStorage.getItem('usuario');
-        console.log('💾 Guardado en localStorage:', savedUser);
-        
-        // Actualizar contexto
+        // Actualizar contexto global de autenticación
         login(usuarioAdaptado);
         
-        // 🔥 REDIRECCIÓN
-        console.log('🔄 Redirigiendo a /');
-        
-        // Redirección principal
+        // Redirigir al menú principal
         navigate('/');
-        
-        // Redirección forzada como backup
-        setTimeout(() => {
-          if (window.location.pathname === '/login') {
-            window.location.href = '/';
-          }
-        }, 100);
         
       } else {
         // Manejar errores del backend
@@ -132,13 +107,13 @@ export default function Login() {
         } else if (data.error) {
           setError(data.error);
         } else {
-          setError(`Error del servidor (${response.status})`);
+          setError('Error en el servidor. Intenta nuevamente.');
         }
       }
       
     } catch (error) {
-      console.error('Error de conexión completo:', error);
-      setError('No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8081');
+      console.error('💥 Error de conexión completo:', error);
+      setError('Error de conexión con el servidor. Verifica que el backend esté corriendo en http://localhost:8081');
     } finally {
       setLoading(false);
     }
@@ -234,13 +209,17 @@ export default function Login() {
             </p>
           </div>
           
+          {/* 🔥 NOTA DE DESARROLLO */}
           <div className="dev-note">
-
-            
+            <p><strong>Nota para desarrollo:</strong></p>
+            <p>Endpoint: POST http://localhost:8081/usuario/login</p>
+            <p>Body esperado: {"{"}"correo": "email", "contrasena": "password"{"}"}</p>
+            <p>Revisa la consola (F12) para ver los logs</p>
           </div>
         </div>
       </div>
 
+      {/* Estilos para el spinner */}
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }

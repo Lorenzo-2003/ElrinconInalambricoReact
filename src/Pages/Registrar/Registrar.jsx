@@ -60,13 +60,6 @@ const Registrar = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        // 
-        if (!formData.rut.trim()) {
-            newErrors.rut = 'El RUT es requerido';
-        } else if (!isValidRUT(formData.rut)) {
-            newErrors.rut = 'Ingresa un RUT válido (ej: 12.345.678-9)';
-        }
-
         if (!formData.nombre.trim()) {
             newErrors.nombre = 'El nombre es requerido';
         } else if (formData.nombre.trim().length < 2) {
@@ -186,55 +179,61 @@ const Registrar = () => {
     };
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setBackendError('');
+        e.preventDefault();
+        setIsSubmitting(true);
+        setBackendError('');
 
-    const formErrors = validateForm();
-    
-    if (Object.keys(formErrors).length === 0) {
-        try {
-            // 
-            const usuarioBackend = {
-                rut: formData.rut.trim(),
-                nombre: `${formData.nombre.trim()} ${formData.apellido.trim()}`,
-                correo: formData.email.trim(),
-                contrasena: formData.password,
-                telefono: formData.telefono || null,  // ← Como String o null
-            };
-
-            console.log('📤 Enviando a backend:', usuarioBackend);
-            console.log('🎯 El backend asignará rol según email:', formData.email);
-
-            // 🔥 CONEXIÓN AL BACKEND
-            const response = await fetch('http://localhost:8081/usuario', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(usuarioBackend),
-            });
-
-            console.log('📥 Respuesta del servidor - Status:', response.status);
-
-            if (response.ok) {
-                try {
-                    const usuarioCreado = await response.json();
-                    console.log('✅ Usuario registrado exitosamente:', usuarioCreado);
+        const formErrors = validateForm();
+        
+        if (Object.keys(formErrors).length === 0) {
+            try {
+                // 🔥 MAPEO DE DATOS: Frontend → Backend
+                const usuarioBackend = {
+                    // Tu backend NO tiene "apellido", combinamos nombre + apellido
+                    nombre: `${formData.nombre} ${formData.apellido}`.trim(),
                     
-                    // Mostrar mensaje según el rol que se asignó
-                    let mensaje = '';
-                    if (formData.email.includes('@admin.') || formData.email.startsWith('admin@')) {
-                        mensaje = `¡Administrador ${formData.nombre} registrado exitosamente!`;
-                    } else {
-                        mensaje = `¡Bienvenido ${formData.nombre}! Tu cuenta de usuario ha sido creada.`;
+                    // Tu backend usa "correo", no "email"
+                    correo: formData.email,
+                    
+                    // Tu backend usa "contrasena", no "password"
+                    contrasena: formData.password,
+                    
+                    // Teléfono: convertir string a número (o null si está vacío)
+                    telefono: formData.telefono ? parseInt(formData.telefono) : 0,
+                    
+                    // RUT: Tu backend lo requiere pero frontend no lo pide
+                    // Podemos generar uno temporal o hacerlo opcional
+                    // OPCION 1: Dejar vacío (si tu BD lo permite)
+                    // OPCION 2: Generar uno temporal
+                    rut: `temp-${Date.now()}`, // Temporal, luego el usuario deberá actualizar
+                    
+                    // Rol: Por defecto asignamos rol "cliente" (necesitas el ID del rol)
+                    // Esto depende de cómo tengas los roles en tu BD
+                    rol: {
+                        id: 2, // Asumiendo que ID 2 = "cliente", ID 1 = "admin"
+                        nombre: "cliente"
                     }
+                };
+
+                console.log('Enviando a backend:', usuarioBackend);
+
+                // 🔥 CONEXIÓN AL BACKEND SPRING BOOT
+                const response = await fetch('http://localhost:8081/usuario', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(usuarioBackend),
+                });
+
+                if (response.ok) {
+                    const usuarioCreado = await response.json();
+                    console.log('Usuario registrado en backend:', usuarioCreado);
                     
-                    alert(mensaje);
+                    alert(`¡Usuario ${usuarioCreado.nombre} registrado exitosamente!`);
                     
                     // Limpiar formulario
                     setFormData({
-                        rut: '',
                         nombre: '',
                         apellido: '',
                         email: '',
@@ -243,48 +242,28 @@ const Registrar = () => {
                         confirmPassword: ''
                     });
                     
-                    // Redirigir a login después de 2 segundos
-                    setTimeout(() => {
-                        navigate('/login');
-                    }, 2000);
+                    // Redirigir a login
+                    navigate('/login');
                     
-                } catch (jsonError) {
-                    console.error(' Error parseando JSON:', jsonError);
-                    // Aún así, mostrar éxito si el status fue 200
-                    alert(' Registro exitoso');
-                    setTimeout(() => navigate('/login'), 2000);
-                }
-                
-            } else {
-                const errorText = await response.text();
-                console.error(' Error del backend:', response.status, errorText);
-                
-                // Manejar errores específicos
-                if (errorText.includes('Data too long for column') || errorText.includes('truncation')) {
-                    setBackendError('Error: El RUT es demasiado largo. Máximo 12 caracteres.');
+                } else if (response.status === 400) {
+                    const errorData = await response.json();
+                    setBackendError(errorData.message || 'Error en los datos enviados');
                 } else if (response.status === 409) {
                     setBackendError('El correo electrónico ya está registrado');
-                } else if (response.status === 400) {
-                    setBackendError('Datos inválidos. Verifica la información ingresada.');
-                } else if (response.status === 500 && errorText.includes('rut')) {
-                    setBackendError('Error con el RUT. Verifica el formato (ej: 12.345.678-9)');
-                } else if (response.status === 500 && errorText.includes('rol') || errorText.includes('Rol')) {
-                    setBackendError('Error al asignar rol. ¿Existen los roles en la BD?');
                 } else {
-                    setBackendError(`Error del servidor (${response.status}): ${errorText.substring(0, 200)}`);
+                    setBackendError('Error en el servidor. Intenta nuevamente.');
                 }
+                
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                setBackendError('Error de conexión con el servidor. Verifica que el backend esté corriendo.');
             }
-            
-        } catch (error) {
-            console.error(' Error de conexión:', error);
-            setBackendError('No se pudo conectar con el servidor. Verifica que el backend esté corriendo.');
+        } else {
+            setErrors(formErrors);
         }
-    } else {
-        setErrors(formErrors);
-    }
-    
-    setIsSubmitting(false);
-};
+        
+        setIsSubmitting(false);
+    };
 
     return (
         <div className="menu-bg" style={{minHeight: '100vh'}}>
@@ -293,21 +272,12 @@ const Registrar = () => {
             <div className="registrar-box">
                 <h1 className="registrar-title">Crear Cuenta</h1>
                 
+                {/* 🔥 Mostrar error del backend */}
                 {backendError && (
-                    <div className="alert alert-danger" style={{
-                        marginBottom: '20px',
-                        padding: '10px 15px',
-                        backgroundColor: '#f8d7da',
-                        color: '#721c24',
-                        border: '1px solid #f5c6cb',
-                        borderRadius: '4px',
-                        whiteSpace: 'pre-line'
-                    }}>
-                        ⚠️ {backendError}
+                    <div className="alert alert-danger" style={{marginBottom: '20px'}}>
+                        {backendError}
                     </div>
                 )}
-                
-
                 
                 <form onSubmit={handleSubmit} id="registerForm">
                     <div className="form-group">
@@ -440,6 +410,23 @@ const Registrar = () => {
                 
                 <div className="registrar-links">
                     ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
+                </div>
+                
+                {/* 🔥 Información para desarrollo */}
+                <div style={{
+                    marginTop: '20px',
+                    padding: '10px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '5px',
+                    fontSize: '11px',
+                    color: '#666',
+                    textAlign: 'left'
+                }}>
+                    <p><strong>Información técnica:</strong></p>
+                    <p><strong>Backend URL:</strong> http://localhost:8080/usuario</p>
+                    <p><strong>Campo "nombre" en backend:</strong> "{formData.nombre} {formData.apellido}"</p>
+                    <p><strong>Campo "correo" en backend:</strong> {formData.email}</p>
+                    <p><strong>Campo "telefono" en backend:</strong> {formData.telefono || '0'}</p>
                 </div>
                 
                 

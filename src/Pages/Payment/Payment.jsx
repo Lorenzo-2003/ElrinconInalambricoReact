@@ -3,305 +3,443 @@ import { useNavigate } from 'react-router-dom';
 import useCart from '../../hooks/Carrito';
 import { apiService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import Header from '../../Components/Header';
 import './Payment.css';
 
 export default function Payment() {
-   const { cart, getTotal, removeFromCart } = useCart();
-   const { user: authUser } = useAuth();
-   const [paymentMethod, setPaymentMethod] = useState('card');
-   const [loading, setLoading] = useState(false);
-   const [invoice, setInvoice] = useState(null);
-   const [userDetails, setUserDetails] = useState(null);
-   const [paymentData, setPaymentData] = useState({
-     cardNumber: '',
-     cardName: '',
-     expiryDate: '',
-     cvv: '',
-     paypalEmail: ''
-   });
-   const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { cart, cartTotal, clearCart } = useCart();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+  const [formData, setFormData] = useState({
+    // Tarjeta de crédito
+    cardNumber: '',
+    cardName: '',
+    expiryDate: '',
+    cvv: '',
+    // PayPal
+    paypalEmail: '',
+    // Datos adicionales
+    phone: '',
+    address: ''
+  });
 
+  console.log('🛒 Payment component loaded');
+  console.log('👤 User:', user);
+  console.log('🛍️ Cart:', cart);
+  console.log('💰 Cart Total:', cartTotal);
+
+  // Obtener métodos de pago al cargar
   useEffect(() => {
-     // Redirect if cart is empty
-     if (cart.length === 0) {
-       navigate('/');
-       return;
-     }
+    console.log('💳 Fetching payment methods...');
+    const fetchPaymentMethods = async () => {
+      try {
+        const methods = await apiService.pago.getFpagos();
+        console.log('✅ Payment methods loaded:', methods);
+        setPaymentMethods(methods);
+        if (methods.length > 0) {
+          setSelectedPaymentMethod(methods[0].id.toString());
+        }
+      } catch (err) {
+        console.error('❌ Error loading payment methods:', err);
+        setError('Error al cargar métodos de pago');
+      }
+    };
+    fetchPaymentMethods();
+  }, []);
 
-     // Redirect if not logged in
-     if (!authUser || !authUser.id) {
-       navigate('/iniciar-sesion');
-       return;
-     }
+  // Verificar autenticación - SOLO redirigir si no hay user
+  useEffect(() => {
+    console.log('🔍 Checking auth...');
+    if (!user) {
+      console.log('⚠️ No user, redirecting to login');
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
-     // Load user data
-     const loadUserData = async () => {
-       try {
-         const userData = await apiService.usuario.getUsuario(authUser.id);
-         setUserDetails(userData);
-       } catch (error) {
-         console.error('Error loading user data:', error);
-       }
-     };
-
-     loadUserData();
-   }, [cart, authUser, navigate]);
+  // Verificar carrito - SOLO redirigir si está vacío
+  useEffect(() => {
+    console.log('🔍 Checking cart...');
+    if (cart.length === 0) {
+      console.log('⚠️ Empty cart, redirecting to cart');
+      navigate('/cart');
+    }
+  }, [cart, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setPaymentData(prev => ({
+
+    
+    let formattedValue = value;
+
+    if (name === 'cardNumber') {
+      // Formatear número de tarjeta: 1234 5678 9012 3456
+      const cleaned = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+      const match = cleaned.match(/\d{1,4}/g);
+      formattedValue = match ? match.join(' ').substr(0, 19) : '';
+    } else if (name === 'expiryDate') {
+      // Formatear fecha: MM/YY
+      const cleaned = value.replace(/\D+/g, '');
+      if (cleaned.length >= 2) {
+        formattedValue = cleaned.substring(0, 2) + '/' + cleaned.substring(2, 4);
+      } else {
+        formattedValue = cleaned;
+      }
+    } else if (name === 'cvv') {
+      // Solo números para CVV
+      formattedValue = value.replace(/[^0-9]/g, '').substring(0, 3);
+    } else if (name === 'cardName') {
+      // Solo letras y espacios para nombre
+      formattedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+    }
+
+    setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: formattedValue
     }));
   };
 
-  const handlePayment = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+    const selectedMethod = paymentMethods.find(m => m.id.toString() === selectedPaymentMethod);
+
+    if (selectedMethod && (selectedMethod.nombreFpago.toLowerCase().includes('tarjeta') ||
+                           selectedMethod.nombreFpago.toLowerCase().includes('crédito') ||
+                           selectedMethod.nombreFpago.toLowerCase().includes('debito'))) {
+      // Validar campos de tarjeta
+      if (!formData.cardNumber || !formData.cardName || !formData.expiryDate || !formData.cvv) {
+        setError('Completa todos los campos de la tarjeta');
+        return false;
+      }
+      if (formData.cardNumber.replace(/\s/g, '').length < 16) {
+        setError('Número de tarjeta inválido');
+        return false;
+      }
+      if (formData.cvv.length < 3) {
+        setError('CVV inválido');
+        return false;
+      }
+    } else if (selectedMethod && selectedMethod.nombreFpago.toLowerCase().includes('paypal')) {
+      // Validar PayPal
+      if (!formData.paypalEmail) {
+        setError('Ingresa tu email de PayPal');
+        return false;
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.paypalEmail)) {
+        setError('Email de PayPal inválido');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handlePayment = async () => {
+    if (!selectedPaymentMethod) {
+      setError('Selecciona un método de pago');
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
+    setError('');
 
     try {
-      // Create invoice via pago microservice
-      const invoiceData = {
-        usuarioId: authUser.id,
-        carroId: 1, // This should be the actual cart ID from carro microservice
-        formaPago: { id: paymentMethod === 'card' ? 1 : 2 }, // 1=Card, 2=PayPal
-        monto: getTotal(),
-        fecha: new Date().toISOString().split('T')[0]
+      console.log('� Starting payment process...');
+
+      // Paso 1: Sincronizar carrito con BD
+      console.log('🔄 Syncing cart to database...');
+      const syncedCartId = await apiService.pago.syncCartToDatabase(cart, user.id);
+
+      if (!syncedCartId) {
+        throw new Error('Error al sincronizar el carrito con la base de datos');
+      }
+
+      console.log('✅ Cart synced successfully, cartId:', syncedCartId);
+
+      // Paso 2: Crear factura con el cartId real
+      const fechaActual = new Date().toISOString().split('T')[0];
+
+      const facturaData = {
+        usuarioId: parseInt(user.id),
+        carroId: parseInt(syncedCartId),
+        formaPago: { id: parseInt(selectedPaymentMethod) },
+        fecha: fechaActual,
+        monto: cartTotal || 0
       };
 
-      const createdInvoice = await apiService.pago.createFactura(invoiceData);
-      setInvoice(createdInvoice);
+      console.log('📡 Sending factura data to backend:', JSON.stringify(facturaData, null, 2));
+      console.log('� Creating invoice with real cart data...');
+      const result = await apiService.pago.createFactura(facturaData);
+      console.log('✅ Payment completed successfully:', result);
 
-      // Clear cart after successful payment
-      cart.forEach(item => removeFromCart(item.id));
+      // Limpiar carrito local
+      clearCart();
 
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('Error processing payment. Please try again.');
+      // Redirigir a página de éxito
+      navigate('/success');
+
+    } catch (err) {
+      console.error('❌ Payment failed:', err);
+      setError(err.message || 'Error al procesar el pago');
     } finally {
       setLoading(false);
     }
   };
 
-  if (invoice) {
+  // Loading state mientras verifica autenticación
+  if (!user) {
     return (
-      <div className="container my-5 payment-page">
-        <div className="alert alert-success" role="alert">
-          <h4 className="alert-heading">¡Pago Exitoso!</h4>
-          <p>Tu pago ha sido procesado correctamente.</p>
-        </div>
-
-        <div className="card">
-          <div className="card-header bg-success text-white">
-            <h3 className="card-title mb-0">Factura #{invoice.id}</h3>
-          </div>
-          <div className="card-body">
-            <div className="row">
-              <div className="col-md-6">
-                <h5>Información del Cliente</h5>
-                <p><strong>Nombre:</strong> {userDetails?.nombre}</p>
-                <p><strong>RUT:</strong> {userDetails?.rut}</p>
-                <p><strong>Email:</strong> {userDetails?.correo}</p>
-                <p><strong>Teléfono:</strong> {userDetails?.telefono || 'No disponible'}</p>
-              </div>
-              <div className="col-md-6">
-                <h5>Detalles de la Factura</h5>
-                <p><strong>Fecha:</strong> {invoice.fecha}</p>
-                <p><strong>Método de Pago:</strong> {invoice.formaPago.nombreFpago}</p>
-                <p><strong>Total:</strong> ${invoice.monto.toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <h5>Productos Comprados</h5>
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unitario</th>
-                    <th>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cart.map(item => (
-                    <tr key={item.id}>
-                      <td>{item.name}</td>
-                      <td>{item.quantity}</td>
-                      <td>${item.price.toLocaleString()}</td>
-                      <td>${(item.price * item.quantity).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="mt-4 text-center">
-              <button className="btn btn-primary" onClick={() => navigate('/')}>
-                Volver al Inicio
-              </button>
-            </div>
-          </div>
+      <div>
+        <Header />
+        <div className="payment-loading">
+          <div className="loading-spinner"></div>
+          <p>Verificando autenticación...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="container my-5 payment-page">
-      <h1 className="text-center mb-4">Procesar Pago</h1>
+  // Loading state mientras verifica carrito
+  if (cart.length === 0) {
+    return (
+      <div>
+        <Header />
+        <div className="payment-loading">
+          <div className="loading-spinner"></div>
+          <p>Verificando carrito...</p>
+        </div>
+      </div>
+    );
+  }
 
-      <div className="row">
-        <div className="col-md-8">
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title mb-0">Información de Pago</h3>
+  const formatCurrency = (n) => (n || 0).toLocaleString('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
+  const selectedMethod = paymentMethods.find(m => m.id.toString() === selectedPaymentMethod);
+
+  return (
+    <div>
+      <Header />
+      <div className="payment-container">
+        <div className="payment-wrapper">
+          <div className="payment-main">
+            <div className="payment-header">
+              <h1><i className="fas fa-credit-card"></i> Confirmar Pago</h1>
+              <p>Completa tus datos para procesar el pedido</p>
             </div>
-            <div className="card-body">
-              <form onSubmit={handlePayment}>
-                <div className="mb-3">
-                  <label className="form-label">Método de Pago</label>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="paymentMethod"
-                      id="card"
-                      value="card"
-                      checked={paymentMethod === 'card'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                    />
-                    <label className="form-check-label" htmlFor="card">
-                      Tarjeta de Crédito/Débito
-                    </label>
+
+            {error && (
+              <div className="alert alert-danger alert-dismissible fade show">
+                <i className="fas fa-exclamation-triangle"></i>
+                <strong>Error:</strong> {error}
+                <button type="button" className="btn-close" onClick={() => setError('')}></button>
+              </div>
+            )}
+
+            <div className="payment-content">
+              {/* Resumen del pedido */}
+              <div className="order-summary-card">
+                <div className="card-header-custom">
+                  <h3><i className="fas fa-shopping-bag"></i> Resumen del Pedido</h3>
+                </div>
+                <div className="card-body-custom">
+                  <div className="order-items">
+                    {cart.map(item => (
+                      <div key={item.id} className="order-item">
+                        <div className="item-info">
+                          <img src={item.image || '/Img/Carrito3.jpg'} alt={item.name} className="item-thumb" />
+                          <div className="item-details">
+                            <h5>{item.name}</h5>
+                            <p className="item-price">{formatCurrency(item.price)} × {item.quantity || 1}</p>
+                          </div>
+                        </div>
+                        <div className="item-total">
+                          <strong>{formatCurrency((item.price || 0) * (item.quantity || 1))}</strong>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="paymentMethod"
-                      id="paypal"
-                      value="paypal"
-                      checked={paymentMethod === 'paypal'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                    />
-                    <label className="form-check-label" htmlFor="paypal">
-                      PayPal
-                    </label>
+
+                  <div className="order-total">
+                    <div className="total-row">
+                      <span>Total a pagar:</span>
+                      <span className="total-amount">{formatCurrency(cartTotal)}</span>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                {paymentMethod === 'card' ? (
+              {/* Método de pago */}
+              <div className="payment-method-card">
+                <div className="card-header-custom">
+                  <h3><i className="fas fa-money-check-alt"></i> Método de Pago</h3>
+                </div>
+                <div className="card-body-custom">
+                  <div className="payment-method-selector">
+                    <label className="form-label">Selecciona método de pago:</label>
+                    <select
+                      value={selectedPaymentMethod}
+                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                      className="form-select form-select-lg"
+                      disabled={paymentMethods.length === 0}
+                    >
+                      <option value="">
+                        {paymentMethods.length === 0 ? 'Cargando métodos...' : 'Seleccionar método'}
+                      </option>
+                      {paymentMethods.map(method => (
+                        <option key={method.id} value={method.id}>
+                          {method.nombreFpago}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Formulario de tarjeta */}
+                  {selectedMethod && (selectedMethod.nombreFpago.toLowerCase().includes('tarjeta') ||
+                                     selectedMethod.nombreFpago.toLowerCase().includes('crédito') ||
+                                     selectedMethod.nombreFpago.toLowerCase().includes('debito')) && (
+                    <div className="payment-form">
+                      <h4><i className="fas fa-credit-card"></i> Datos de la Tarjeta</h4>
+                      <div className="form-grid">
+                        <div className="form-group">
+                          <label className="form-label">Número de Tarjeta *</label>
+                          <input
+                            type="text"
+                            name="cardNumber"
+                            className="form-control"
+                            placeholder="1234 5678 9012 3456"
+                            value={formData.cardNumber}
+                            onChange={handleInputChange}
+                            maxLength="19"
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Nombre en la Tarjeta *</label>
+                          <input
+                            type="text"
+                            name="cardName"
+                            className="form-control"
+                            placeholder="JUAN PÉREZ"
+                            value={formData.cardName}
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Fecha de Expiración *</label>
+                          <input
+                            type="text"
+                            name="expiryDate"
+                            className="form-control"
+                            placeholder="MM/YY"
+                            value={formData.expiryDate}
+                            onChange={handleInputChange}
+                            maxLength="5"
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">CVV *</label>
+                          <input
+                            type="password"
+                            name="cvv"
+                            className="form-control"
+                            placeholder="123"
+                            value={formData.cvv}
+                            onChange={handleInputChange}
+                            maxLength="3"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Formulario de PayPal */}
+                  {selectedMethod && selectedMethod.nombreFpago.toLowerCase().includes('paypal') && (
+                    <div className="payment-form">
+                      <h4><i className="fab fa-paypal"></i> PayPal</h4>
+                      <div className="form-group">
+                        <label className="form-label">Email de PayPal *</label>
+                        <input
+                          type="email"
+                          name="paypalEmail"
+                          className="form-control"
+                          placeholder="tu@email.com"
+                          value={formData.paypalEmail}
+                          onChange={handleInputChange}
+                          required
+                        />
+                        <small className="form-text text-muted">
+                          Serás redirigido a PayPal para completar el pago
+                        </small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Información adicional */}
+                  <div className="additional-info">
+                    <h4><i className="fas fa-user"></i> Información Adicional</h4>
+                    <div className="form-grid">
+                      <div className="form-group">
+                        <label className="form-label">Teléfono</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          className="form-control"
+                          placeholder="+569 1234 5678"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Dirección</label>
+                        <textarea
+                          name="address"
+                          className="form-control"
+                          placeholder="Dirección de envío"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          rows="2"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón de pago */}
+            <div className="payment-actions">
+              <button
+                className="btn btn-secondary me-3"
+                onClick={() => navigate('/cart')}
+                disabled={loading}
+              >
+                <i className="fas fa-arrow-left"></i> Volver al Carrito
+              </button>
+              <button
+                onClick={handlePayment}
+                disabled={loading || !selectedPaymentMethod}
+                className="btn-payment-primary"
+              >
+                {loading ? (
                   <>
-                    <div className="row">
-                      <div className="col-md-6 mb-3">
-                        <label htmlFor="cardNumber" className="form-label">Número de Tarjeta</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="cardNumber"
-                          name="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          value={paymentData.cardNumber}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label htmlFor="cardName" className="form-label">Nombre en la Tarjeta</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="cardName"
-                          name="cardName"
-                          placeholder="Juan Pérez"
-                          value={paymentData.cardName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-6 mb-3">
-                        <label htmlFor="expiryDate" className="form-label">Fecha de Expiración</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="expiryDate"
-                          name="expiryDate"
-                          placeholder="MM/YY"
-                          value={paymentData.expiryDate}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label htmlFor="cvv" className="form-label">CVV</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="cvv"
-                          name="cvv"
-                          placeholder="123"
-                          value={paymentData.cvv}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
+                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Procesando Pago...
                   </>
                 ) : (
-                  <div className="mb-3">
-                    <label htmlFor="paypalEmail" className="form-label">Email de PayPal</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      id="paypalEmail"
-                      name="paypalEmail"
-                      placeholder="tu@email.com"
-                      value={paymentData.paypalEmail}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
+                  <>
+                    <i className="fas fa-lock"></i> Pagar {formatCurrency(cartTotal)}
+                  </>
                 )}
-
-                <button
-                  type="submit"
-                  className="btn btn-success btn-lg w-100"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Procesando...
-                    </>
-                  ) : (
-                    `Pagar $${getTotal().toLocaleString()}`
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-header">
-              <h5 className="card-title mb-0">Resumen del Pedido</h5>
-            </div>
-            <div className="card-body">
-              {cart.map(item => (
-                <div key={item.id} className="d-flex justify-content-between mb-2">
-                  <span>{item.name} x {item.quantity}</span>
-                  <span>${(item.price * item.quantity).toLocaleString()}</span>
-                </div>
-              ))}
-              <hr />
-              <div className="d-flex justify-content-between fw-bold">
-                <span>Total:</span>
-                <span>${getTotal().toLocaleString()}</span>
-              </div>
+              </button>
             </div>
           </div>
         </div>
